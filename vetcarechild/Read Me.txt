@@ -1,0 +1,9 @@
+*Instructions
+
+Kindly add a page in your wordpress (Please use this name)
+
+Reports Pet Owners
+Reports Pets
+SMS Account
+SMS Sending
+Waiver
