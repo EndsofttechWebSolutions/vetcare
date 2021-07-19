@@ -1749,4 +1749,5 @@ if(!empty($user_roles)){
 }
 return $myclinic_id;
 }
+
 ?>

@@ -817,7 +817,7 @@ function insert_file(){
 }
 function my_upload_dir($upload) {
 	$clinic_id = getmyclinicid();
-	$upload['subdir'] = '/Clinic-'.$clinic_id.'';
+	$upload['subdir'] = '/';
 	$upload['path']   = $upload['basedir'] . $upload['subdir'];
 	$upload['url']    = $upload['baseurl'] . $upload['subdir'];
 	return $upload;
