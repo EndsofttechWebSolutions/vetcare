@@ -250,7 +250,7 @@ button#sidebarToggle {
     transform: translateX(-225px);
 }
 button#sidebarToggle {
-    display: block;
+    display: inline-block;
 }
 }
 </style>

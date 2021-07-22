@@ -32,6 +32,7 @@ foreach ($results as $key ) {
 
 $arrayIMG = offlineview1();
 $arrayIMG2 = offlineview2();
+
 ?>
 
 <style>
@@ -269,7 +270,7 @@ $arrayIMG2 = offlineview2();
     text-align: center;
   }
   p.total-text {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: white;
   }
   p.total-number a {
@@ -292,7 +293,7 @@ $arrayIMG2 = offlineview2();
       </ol>
       <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-lg-3 col-md-6">
           <div class="grid-container">
             <div class="grid-item">
               <div class="appointment">
@@ -321,7 +322,7 @@ $arrayIMG2 = offlineview2();
               <!--  </div>-->
               <!--</div>-->
             </div>
-            <div class="col-md-3">
+            <div class="col-lg-3 col-md-6">
               <div class="grid-container" style="background-color:#0077F7;">
                 <div class="grid-item">
                   <div class="appointment">
@@ -350,7 +351,7 @@ $arrayIMG2 = offlineview2();
                   <!--  </div>-->
                   <!--</div>-->
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6">
                   <div class="grid-container" style="background-color:#6CCAC9;">
                     <div class="grid-item">
                       <div class="appointment">
@@ -379,7 +380,7 @@ $arrayIMG2 = offlineview2();
                       <!--  </div>-->
                       <!--</div>-->
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-lg-3 col-md-6">
                       <div class="grid-container" style="background-color:#169CB2;">
                         <div class="grid-item">
                           <div class="appointment">
