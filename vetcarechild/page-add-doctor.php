@@ -181,7 +181,7 @@ $('#openmodalDoctor').click(function(){
 });
 
 $('#employeeTable').DataTable({
-	ajax: url+"employeetable",
+	ajax: url+"employeetable/<?php echo $myclinic_id;?>",
 });
 
 $('#addEmployee').click(function(){

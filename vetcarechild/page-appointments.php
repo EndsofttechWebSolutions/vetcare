@@ -27,7 +27,7 @@ if(!empty($user_roles)){
 				<div class="col-md-12">
 					<div class="card mb-4">
 						<div class="card-header"><i class="fas fa-chart-bar mr-1"></i>Appointments  <div class="float-right">
-								<span class="badge badge-warning">Upcoming</span>
+								<span class="badge badge-primary">Upcoming</span>
 								<span class="badge badge-success">Completed</span>
 								<span class="badge badge-danger">Absent</span>
 							</div></div>
@@ -404,9 +404,9 @@ calendar.render();
   	$( this ).serializeArray().forEach(x=>{
   		data[x.name] = x.value;
   	});
-	$('#sms_form').serializeArray().forEach(x=>{
+  	$('#sms_form').serializeArray().forEach(x=>{
              data[x.name] = x.value;
-        });
+    });
   	 data['clinic_id'] = <?php echo $myclinic_id;?>;
   	if(complaints !== "" && petname !== null){
   	$.ajax({
@@ -429,7 +429,6 @@ calendar.render();
   		}
   	});
   	}
-	//console.log(data)
   	return false;
   });
 

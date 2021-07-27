@@ -7,13 +7,13 @@ $user = get_userdata( get_current_user_id());
 $ID = get_current_user_id();
 $user_roles = $user->roles;
 if(!empty($user_roles)){
-	if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
-		$myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
-	}else if(in_array( 'um_clinic', $user_roles, true )){
-		$myclinic_id = get_current_user_id();
-	}else{
-		$myclinic_id = get_current_user_id();
-	}
+  if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
+    $myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
+  }else if(in_array( 'um_clinic', $user_roles, true )){
+    $myclinic_id = get_current_user_id();
+  }else{
+    $myclinic_id = get_current_user_id();
+  }
 }
 
 ?>
@@ -40,7 +40,7 @@ if(!empty($user_roles)){
 		<div class="container-fluid">
 			<h1 class="mt-4"></h1>
 			<ol class="breadcrumb mb-2">
-				<li class="breadcrumb-item"><a href="<?php echo get_site_url();?>/add-owner"> Owners Lists</a></li>
+				<li class="breadcrumb-item"><a href="<?php echo get_site_url();?>/add-owner/?"> Owners Lists</a></li>
 				<li class="breadcrumb-item active">Owner Details</li>
 			</ol>
 			<br>
@@ -225,7 +225,7 @@ if(!empty($user_roles)){
 									</div>
 
 								</div>
-								<button type="submit" class="btn btn-primary float-right" name="addpetbutton">Add New Pet</button>
+								<button type="button" class="btn btn-primary float-right" name="addpetbutton" onclick="addmypet()">Add New Pet</button>
 							</form>
 						</div>
 					</div>
@@ -262,7 +262,7 @@ if(!empty($user_roles)){
 
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-primary" name="submit" onclick="editNow()">Edit Now</button>
-					<button type="submit" class="btn btn-primary" name="submit" onclick="return okFunc()">Ok</button>
+					<button type="submit" class="btn btn-primary" name="submit" onclick="return okFunc()">Remove Note</button>
 					<button type="submit" class="btn btn-primary" name="submit" onclick="return savepending()">Save Pendings</button>
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>
@@ -357,10 +357,6 @@ function capture_again(){
 
 }
 function addmypet(){
-	
-}
-$('#mynewpets').submit(function(e){
-	e.preventDefault();
 	let mynewpet = {};
 	$('#mynewpets').serializeArray().forEach(x=>{
 		mynewpet[x.name] = x.value;
@@ -368,6 +364,7 @@ $('#mynewpets').submit(function(e){
 	mynewpet['ownerID'] = id;
 	mynewpet['image'] = image_data;
 	mynewpet['clinic_id'] = <?php echo $myclinic_id;?>;
+	console.log(mynewpet)
 	fetch(url+'mypets',{
 		method:"POST",
 		body: JSON.stringify(mynewpet)
@@ -384,14 +381,14 @@ $('#mynewpets').submit(function(e){
 					});
 					getmypets(id);
 				}
-	});
-})
+			});
+}
 
 function getmydetails(id){
 	fetch(url+'owner/'+id).then(res=>res.json()).then(res=>{
 		if(res[0].image == ""){
-			res[0].image = "<?php echo get_site_url();?>/wp-content/uploads/2020/03/vet-app-icon-removebg-preview-1.png";
-		}
+				res[0].image = "<?php echo get_site_url();?>/wp-content/uploads/2020/03/vet-app-icon-removebg-preview-1.png";
+			}
 		$('#myname').html(res[0].first_name+" "+res[0].last_name);
 		$('#fname').val(res[0].first_name);
 		$('#lname').val(res[0].last_name);

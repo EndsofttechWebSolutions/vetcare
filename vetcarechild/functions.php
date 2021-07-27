@@ -1,277 +1,285 @@
 <?php
-	/*This file is part of vetcarechild, oceanwp child theme.
-
-	All functions of this file will be loaded before of parent theme functions.
-	Learn more at https://codex.wordpress.org/Child_Themes.
-
-	Note: this function loads the parent stylesheet before, then child theme stylesheet
-	(leave it in place unless you know what you are doing.)
-	*/
-	
-
-
-	global $post, $current_user; wp_get_current_user();
+/*This file is part of vetcarechild, oceanwp child theme.
+All functions of this file will be loaded before of parent theme functions.
+Learn more at https://codex.wordpress.org/Child_Themes.
+Note: this function loads the parent stylesheet before, then child theme stylesheet
+(leave it in place unless you know what you are doing.)
+*/
+global $post, $current_user; wp_get_current_user();
+$clinic_id = get_current_user_id();
+$username = get_post_meta($clinic_id, 'username_sms', true);
+if($username == ''){
 	$username_sms = get_post_meta( '130', 'username_sms', true );
 	$password_sms = get_post_meta( '130', 'password_sms', true );
 	$sender_id = get_post_meta( '130', 'sender_id', true );
 	$content_message = get_post_meta( '130', 'content_message', true );
 	$tax_percentage = get_post_meta( '130', 'tax_percentage', true );
-
-	add_role('um_clinic', 'Clinic',true);
-	remove_role('wpamelia-manager');
-	remove_role('wpamelia-provider');
-	remove_role('wpamelia-customer');
+	$time_sms = get_post_meta( '130', 'time_sms', true );
 	
-	if(!empty(get_current_user_id())){
-		$currentuser = get_userdata( get_current_user_id());
-		$my_role = $currentuser->roles;	
-	}
+	add_post_meta($clinic_id, 'username_sms',$username_sms);
+	add_post_meta($clinic_id, 'password_sms',$password_sms);
+	add_post_meta($clinic_id, 'sender_id',$sender_id);
+	add_post_meta($clinic_id, 'content_message',$content_message);
+	add_post_meta($clinic_id, 'tax_percentage',$tax_percentage);
+	add_post_meta($clinic_id, 'time_sms',$time_sms);
+	
+}
+$username_sms = get_post_meta( $clinic_id, 'username_sms', true );
+$password_sms = get_post_meta( $clinic_id, 'password_sms', true );
+$sender_id = get_post_meta( $clinic_id, 'sender_id', true );
+$content_message = get_post_meta( $clinic_id, 'content_message', true );
+$tax_percentage = get_post_meta( $clinic_id, 'tax_percentage', true );
+$time_sms = get_post_meta( $clinic_id, 'time_sms', true );
+add_role('um_clinic', 'Clinic',true);
+remove_role('wpamelia-manager');
+remove_role('wpamelia-provider');
+remove_role('wpamelia-customer');
 
-	if(!empty($my_role)){
-		if (in_array( 'um_doctors', $my_role, true ) || in_array( 'um_groomers', $my_role, true ) ) {
-			$global_clinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
-		}else if(in_array( 'um_clinic', $my_role, true )){
-			$global_clinic_id = get_current_user_id();
+$currentuser = get_userdata( get_current_user_id());
+$my_role = $currentuser->roles;
+if(!empty($my_role)){
+	if (in_array( 'um_doctors', $my_role, true ) || in_array( 'um_groomers', $my_role, true ) ) {
+		$global_clinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
+	}else if(in_array( 'um_clinic', $my_role, true )){
+		$global_clinic_id = get_current_user_id();
+	}else{
+		$global_clinic_id = get_current_user_id();
+	}
+}
+
+function vetcarechild_enqueue_child_styles() {
+	$parent_style = 'parent-style';
+	wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css' );
+	wp_enqueue_style(
+		'child-style',
+		get_stylesheet_directory_uri() . '/style.css',
+		array( $parent_style ),
+		wp_get_theme()->get('Version') );
+}
+add_action( 'wp_enqueue_scripts', 'vetcarechild_enqueue_child_styles' );
+
+function currentLogged_in(){
+	global $post, $current_user; wp_get_current_user();
+	$user = get_userdata( get_current_user_id());
+	$ID = get_current_user_id();
+	$user_roles = $user->roles;
+	if(!empty($user_roles)){
+		if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
+			$myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
+		}else if(in_array( 'um_clinic', $user_roles, true )){
+			$myclinic_id = get_current_user_id();
 		}else{
-			$global_clinic_id = get_current_user_id();
+			$myclinic_id = get_current_user_id();
 		}
 	}
-	
-	function vetcarechild_enqueue_child_styles() {
-		$parent_style = 'parent-style';
-		wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css' );
-		wp_enqueue_style(
-			'child-style',
-			get_stylesheet_directory_uri() . '/style.css',
-			array( $parent_style ),
-			wp_get_theme()->get('Version') );
-	}
-	add_action( 'wp_enqueue_scripts', 'vetcarechild_enqueue_child_styles' );
-	
-	function currentLogged_in(){
-		global $post, $current_user; wp_get_current_user();
-		if(!empty(get_current_user_id())){
-			$user = get_userdata( get_current_user_id());
-			$ID = get_current_user_id();
-			$user_roles = $user->roles;
-		}
-		$myclinic_id = '';
-		if(!empty($user_roles)){
-			if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
-				$myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
-			}else if(in_array( 'um_clinic', $user_roles, true )){
-				$myclinic_id = get_current_user_id();
-			}else{
-				$myclinic_id = get_current_user_id();
-			}
-		}
-		return $myclinic_id;
-	}
-	function updateMessageTempate(){
-		$data = json_decode(file_get_contents("php://input"));
-		$clinic_id = $data->clinic_id;
-		update_post_meta('130','content_message',$data->content);
-		return array('status'=>200,'message'=>'OK');
-	}
-	function updateSMSAccount(){
-		$data = json_decode(file_get_contents("php://input"));
-		$myclinic_id = $data->clinic_id;
-		update_post_meta('130', 'username_sms',$data->accountName);
-		update_post_meta('130', 'password_sms',$data->password);
-		update_post_meta('130', 'sender_id',$data->sendID);
-		update_post_meta('130', 'time_sms',$data->time_sms);
-		return array('status'=>200,'message'=>'OK' ,'clinic_id' => $myclinic_id);
-	}
-	function updateClinic(){
-		$data = json_decode(file_get_contents("php://input"));
-		$clinic_address = get_user_meta($data->user_id,'address',true);
-		$mobile_number = get_user_meta($data->user_id,'mobile_number',true);
-		$landline = get_user_meta($data->user_id,'landline',true);
-			update_user_meta($data->user_id,'address',$data->address,$clinic_address);
-			update_user_meta($data->user_id,'mobile_number',$data->mobile_number,$mobile_number);
-			update_user_meta($data->user_id,'landline',$data->landline,$landline);
+	return $myclinic_id;
+}
+function updateMessageTempate(){
+	$data = json_decode(file_get_contents("php://input"));
+	$clinic_id = $data->clinic_id;
+	update_post_meta($clinic_id,'content_message',$data->content);
+	return array('status'=>200,'message'=>'OK');
+}
+function updateSMSAccount(){
+	$data = json_decode(file_get_contents("php://input"));
+	$myclinic_id = $data->clinic_id;
+	update_post_meta($myclinic_id, 'username_sms',$data->accountName);
+	update_post_meta($myclinic_id, 'password_sms',$data->password);
+	update_post_meta($myclinic_id, 'sender_id',$data->sendID);
+	update_post_meta($myclinic_id, 'time_sms',$data->time_sms);
+	return array('status'=>200,'message'=>'OK' ,'clinic_id' => $myclinic_id);
+}
+function updateClinic(){
+	$data = json_decode(file_get_contents("php://input"));
+	$clinic_address = get_user_meta($data->user_id,'address',true);
+	$mobile_number = get_user_meta($data->user_id,'mobile_number',true);
+	$landline = get_user_meta($data->user_id,'landline',true);
 
-		return array('status'=>200,'message'=>'OK','user'=>$data->user_id);
-	}
-	
-	if(isset($_POST['adddoctorbutton'])){
-		insert_doctor();
-	}
-	if(isset($_POST['addsmsmerchantbutton'])){
-		insert_merchant();
+	if(get_user_meta($data->user_id,'address',true)){
+		update_user_meta($data->user_id,'address',$data->address,$clinic_address);
+		update_user_meta($data->user_id,'mobile_number',$data->mobile_number,$mobile_number);
+		update_user_meta($data->user_id,'landline',$data->landline,$landline);
+	}else{
+		add_user_meta($data->user_id,'address',$data->address,true);
+		add_user_meta($data->user_id,'mobile_number',$data->mobile_number,true);
+		add_user_meta($data->user_id,'landline',$data->landline,true);
 	}
 
-	if(isset($_POST['delete_eachAppointment'])){
-		$appointment_id = isset( $_GET['id'] ) ? sanitize_text_field( $_GET['id'] ) : '';
-		delete_eachAppointment($appointment_id);
-	}
-	if(isset($_POST['submitlogin'])){
-		login_doctor();
-	}
+	return array('status'=>200,'message'=>'OK','user'=>$data->user_id);
+}
 
-	function insert_appointments($arr){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_appointments';
-		$wpdb->insert( $table, $arr[0],array('%s','%s','%s','%s','%s','%s','%s','%s'));
-		$appointment_number = $wpdb->insert_id;
-		historyInsert(["action"=>"Created new appointment with appointment # ". $appointment_number]);
-		$page_url = home_url( $wp->request );
-		$redirect_to = add_query_arg($page_url);
-		wp_safe_redirect( $redirect_to );
-		exit;
+if(isset($_POST['adddoctorbutton'])){
+	insert_doctor();
+}
+if(isset($_POST['addsmsmerchantbutton'])){
+	insert_merchant();
+}
 
-	}
-	
-	// Start Login Doctors
-	function login_doctor(){
-		global $wpdb;  
+if(isset($_POST['delete_eachAppointment'])){
+	$appointment_id = isset( $_GET['id'] ) ? sanitize_text_field( $_GET['id'] ) : '';
+	delete_eachAppointment($appointment_id);
+}
+// if(isset($_POST['submitlogin'])){
+// 	login_doctors();
+// }
+
+function insert_appointments($arr){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_appointments';
+	$wpdb->insert( $table, $arr[0],array('%s','%s','%s','%s','%s','%s','%s','%s'));
+	$appointment_number = $wpdb->insert_id;
+	historyInsert(["action"=>"Created new appointment with appointment # ". $appointment_number]);
+	$page_url = home_url( $wp->request );
+	$redirect_to = add_query_arg($page_url);
+	wp_safe_redirect( $redirect_to );
+	exit;
+
+}
+// Karl Login code
+// Start Login Doctors
+function login_doctors(){
+	global $wpdb,$wp;  
 	    //We shall SQL escape all inputs  
-		$username = $wpdb->escape($_REQUEST['username']);  
-		$password = $wpdb->escape($_REQUEST['password']);  
-		// $remember = $wpdb->escape($_REQUEST['rememberme']);  
+	$username = $wpdb->escape($_REQUEST['username']);  
+	$password = $wpdb->escape($_REQUEST['password']);  
+	$remember = $wpdb->escape($_REQUEST['rememberme']);  
 
-		// if($remember) $remember = "true";  
-		// else $remember = "false";  
+	if($remember) $remember = "true";  
+	else $remember = "false";  
 
-		$login_data = array();  
-		$login_data['user_login'] = $username;  
-		$login_data['user_password'] = $password;  
-		// $login_data['remember'] = $remember;  
+	$login_data = array();  
+	$login_data['user_login'] = $username;  
+	$login_data['user_password'] = $password;  
+	$login_data['remember'] = $remember;  
 
-		$user_verify = wp_signon( $login_data, false );  
+	$user_verify = wp_signon( $login_data, false );  
+	if ( is_wp_error($user_verify) ) { 
+		echo "<script> alert('Invalid Login Details!');</script>";
+	} else{
+		wp_redirect(home_url('/dashboard/'));
+	} 
 
-		if ( is_wp_error($user_verify) ) 
-		{ 
-			echo "<script> alert('Invalid Login Details!');</script>";
-		} else
-		{ 
-			echo "<script type='text/javascript'>window.location.href='". home_url('/dashboard') ."'</script>"; 
-			exit(); 
-		} 
+}
 
-	}
+//End Login Doctors
+// Karl add doctors code
 
-	//End Login Doctors
+function insert_doctor(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_doctors';
+	$last_name = isset( $_POST['lastName'] ) ? sanitize_text_field( $_POST['lastName'] ) : '';
+	$first_name = isset( $_POST['firstName'] ) ? sanitize_text_field( $_POST['firstName'] ) : '';
+	$address = isset( $_POST['address'] ) ? sanitize_text_field( $_POST['address'] ) : '';
+	$mobile_no = isset( $_POST['mobileNumber'] ) ? sanitize_text_field( $_POST['mobileNumber'] ) : '';
+	$landline_no = isset( $_POST['landlineNumber'] ) ? sanitize_text_field( $_POST['landlineNumber'] ) : '';
+	$birthdate = isset( $_POST['birthdate'] ) ? sanitize_text_field( $_POST['birthdate'] ) : '';
+	$gender = isset( $_POST['gender'] ) ? sanitize_text_field( $_POST['gender'] ) : '';
+	$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
+	$uname = isset( $_POST['uname'] ) ? sanitize_text_field( $_POST['uname'] ) : '';
+	$pass = isset( $_POST['pass'] ) ? sanitize_text_field( $_POST['pass'] ) : '';
+	$role = isset( $_POST['role'] ) ? sanitize_text_field( $_POST['role'] ) : '';
+	$post_data=array(
+		'doctor_id'=>NULL,
+		'last_name' => $last_name,
+		'first_name' => $first_name,
+		'address' => $address,
+		'mobile_no' => $mobile_no,
+		'landline_no' => $landline_no,
+		'birthdate' => $birthdate,
+		'gender' => $gender,
+		'email' => $email,
+		'username' => $uname,
+		'password' => $pass,
+		'role' => $role
 
+	);
+	$wpdb->insert( $table, $post_data,array('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'));
+	$page_url = home_url( $wp->request );
+	$redirect_to = add_query_arg($page_url);
 
+	wp_safe_redirect( $redirect_to );
+	exit;
 
-	// Karl add doctors code
-
-	function insert_doctor(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_doctors';
-		$last_name = isset( $_POST['lastName'] ) ? sanitize_text_field( $_POST['lastName'] ) : '';
-		$first_name = isset( $_POST['firstName'] ) ? sanitize_text_field( $_POST['firstName'] ) : '';
-		$address = isset( $_POST['address'] ) ? sanitize_text_field( $_POST['address'] ) : '';
-		$mobile_no = isset( $_POST['mobileNumber'] ) ? sanitize_text_field( $_POST['mobileNumber'] ) : '';
-		$landline_no = isset( $_POST['landlineNumber'] ) ? sanitize_text_field( $_POST['landlineNumber'] ) : '';
-		$birthdate = isset( $_POST['birthdate'] ) ? sanitize_text_field( $_POST['birthdate'] ) : '';
-		$gender = isset( $_POST['gender'] ) ? sanitize_text_field( $_POST['gender'] ) : '';
-		$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
-		$uname = isset( $_POST['uname'] ) ? sanitize_text_field( $_POST['uname'] ) : '';
-		$pass = isset( $_POST['pass'] ) ? sanitize_text_field( $_POST['pass'] ) : '';
-		$role = isset( $_POST['role'] ) ? sanitize_text_field( $_POST['role'] ) : '';
-		$post_data=array(
-			'doctor_id'=>NULL,
-			'last_name' => $last_name,
-			'first_name' => $first_name,
-			'address' => $address,
-			'mobile_no' => $mobile_no,
-			'landline_no' => $landline_no,
-			'birthdate' => $birthdate,
-			'gender' => $gender,
-			'email' => $email,
-			'username' => $uname,
-			'password' => $pass,
-			'role' => $role
-
-		);
-		$wpdb->insert( $table, $post_data,array('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'));
-		$page_url = home_url( $wp->request );
-		$redirect_to = add_query_arg($page_url);
-
-		wp_safe_redirect( $redirect_to );
-		exit;
-
-	}
+}
 	//
 
 	// Karl add sms merchant code
 
-	function insert_merchant(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_sms_merchant';
-		$username = isset( $_POST['userName'] ) ? sanitize_text_field( $_POST['userName'] ) : '';
-		$password = isset( $_POST['password'] ) ? sanitize_text_field( $_POST['password'] ) : '';
-		$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
-		$fullname = isset( $_POST['fullName'] ) ? sanitize_text_field( $_POST['fullName'] ) : '';
-		$daily_limit = isset( $_POST['dailyLimit'] ) ? sanitize_text_field( $_POST['dailyLimit'] ) : '';
-		$monthly_limit = isset( $_POST['monthlyLimit'] ) ? sanitize_text_field( $_POST['monthlyLimit'] ) : '';
+function insert_merchant(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_sms_merchant';
+	$username = isset( $_POST['userName'] ) ? sanitize_text_field( $_POST['userName'] ) : '';
+	$password = isset( $_POST['password'] ) ? sanitize_text_field( $_POST['password'] ) : '';
+	$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
+	$fullname = isset( $_POST['fullName'] ) ? sanitize_text_field( $_POST['fullName'] ) : '';
+	$daily_limit = isset( $_POST['dailyLimit'] ) ? sanitize_text_field( $_POST['dailyLimit'] ) : '';
+	$monthly_limit = isset( $_POST['monthlyLimit'] ) ? sanitize_text_field( $_POST['monthlyLimit'] ) : '';
 
 
-		$post_data=array(
-			'merchant_id'=>NULL,
-			'username' => $username,
-			'password' => $password,
-			'email' => $email,
-			'fullname' => $fullname,
-			'daily_limit' => $daily_limit,
-			'monthly_limit' => $monthly_limit,
+	$post_data=array(
+		'merchant_id'=>NULL,
+		'username' => $username,
+		'password' => $password,
+		'email' => $email,
+		'fullname' => $fullname,
+		'daily_limit' => $daily_limit,
+		'monthly_limit' => $monthly_limit,
 
-		);
-		$wpdb->insert( $table, $post_data,array('%s','%s','%s','%s','%s','%s'));
-		$page_url = home_url( $wp->request );
-		$redirect_to = add_query_arg($page_url);
+	);
+	$wpdb->insert( $table, $post_data,array('%s','%s','%s','%s','%s','%s'));
+	$page_url = home_url( $wp->request );
+	$redirect_to = add_query_arg($page_url);
 
-		wp_safe_redirect( $redirect_to );
-		exit;
+	wp_safe_redirect( $redirect_to );
+	exit;
 
-	}
+}
 	//
-	
-	function getownerbyIDS($id){
-		global $wpdb;
-		$table_owners=$wpdb->prefix.'vet_owners';
-		$owners = $wpdb->get_results("SELECT * FROM {$table_owners}");
-		$info = [];
-		foreach ($owners as $key){
-			if($id == $key->owner_id){
-				$info = $key;
-			}
+	// Start of Karl Codes Hehehe
+function getownerbyIDS($id){
+	global $wpdb;
+	$table_owners=$wpdb->prefix.'vet_owners';
+	$owners = $wpdb->get_results("SELECT * FROM {$table_owners}");
+	$info = [];
+	foreach ($owners as $key){
+		if($id == $key->owner_id){
+			$info = $key;
 		}
-		return $info;
 	}
-	function displayPetsName(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_pets';
-		$data = json_decode(file_get_contents("php://input"));
-		$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$data->clinic_id}");
-		$arrayData = array();
-		foreach ($results as $key ) {
-			$owner_info = getownerbyIDS($key->owner_id);
-			$arrayDatas = [
-				"pet_id" => $key->pet_id,
-				"pet_name"=> $key->pet_name,
-				"pet_owner" => $owner_info->first_name.' '.$owner_info->last_name
-			];
-			array_push($arrayData, $arrayDatas);
-		}
-		return $arrayData;
+	return $info;
+}
+function displayPetsName(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_pets';
+	$data = json_decode(file_get_contents("php://input"));
+	$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$data->clinic_id}");
+	$arrayData = array();
+	foreach ($results as $key ) {
+		$owner_info = getownerbyIDS($key->owner_id);
+		$arrayDatas = [
+			"pet_id" => $key->pet_id,
+			"pet_name"=> $key->pet_name,
+			"pet_owner" => $owner_info->first_name.' '.$owner_info->last_name
+		];
+		array_push($arrayData, $arrayDatas);
 	}
+	return $arrayData;
+}
 
-	function wp_list_users(){
-		global $wpdb,$wp;
-		$data = json_decode(file_get_contents("php://input"));
-		$users = get_users( [ 'role__in' => [ 'um_doctors', 'um_groomers'] ] );
-		$info = [];
-		foreach($users as $key){
-			// $clinic_id = get_user_meta($key->ID,'clinic_id',true);
-			if($key->roles[0] == "um_doctors"){
-				$key->roles[0] = "Doctor";
-			}
-			if($key->roles[0] == "um_groomers"){
-				$key->roles[0] = "Groomer";
-			}
+function wp_list_users(){
+	global $wpdb,$wp;
+	$data = json_decode(file_get_contents("php://input"));
+	$users = get_users( [ 'role__in' => [ 'um_doctors', 'um_groomers'] ] );
+	$info = [];
+	foreach($users as $key){
+		$clinic_id = get_user_meta($key->ID,'clinic_id',true);
+		if($key->roles[0] == "um_doctors"){
+			$key->roles[0] = "Doctor";
+		}
+		if($key->roles[0] == "um_groomers"){
+			$key->roles[0] = "Groomer";
+		}
+		if($clinic_id == $data->clinic_id){
 
 			$array = [
 				'ID' => $key->ID,
@@ -279,59 +287,61 @@
 				'role'=>$key->roles[0]
 			];
 			array_push($info,$array);
+			
 		}
-		return $info;
+	}
+	return $info;
+
+}
+
+function getStaff(){
+	global $wpdb,$wp;
+	$users = get_users( [ 'role__in' => [ 'um_doctors', 'um_groomers'] ] );
+	$info = [];
+	foreach($users as $key){
+		if($key->roles[0] == "um_doctors"){
+			$key->roles[0] = "Doctor";
+		}
+		if($key->roles[0] == "um_groomers"){
+			$key->roles[0] = "Groomer";
+		}
+		$array = [
+			'ID' => $key->ID,
+			'name'=>$key->display_name,
+			'role'=>$key->roles[0]
+		];
+		array_push($info,$array);
+	}
+	return $info;
+
+}
+
+function getPets(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_pets';
+	$results = $wpdb->get_results("SELECT * FROM {$table}");
+	$info = [];
+	foreach ($results as $key){
+		$owner_info = get_userdata($key->owner_id);
+
+		$arr = [
+			'pet_id'=>  $key->pet_id,
+			'owner_id' => $key->owner_id,
+			'pet_image'=> $key->pet_image,
+			'pet_name'=> $key->pet_name,
+			'pet_type'=> $key->pet_type,
+			'pet_breed'=>$key->pet_breed,
+			'pet_birthdate'=>$key->pet_birthdate,
+			'pet_color'=>$key->pet_color,
+			'pet_weight'=>$key->pet_weight,
+			'pet_gender'=>$key->pet_gender,
+			'owner_info'=> $owner_info->display_name
+		];
+		array_push($info,$arr);
 
 	}
-
-	function getStaff(){
-		global $wpdb,$wp;
-		$users = get_users( [ 'role__in' => [ 'um_doctors', 'um_groomers'] ] );
-		$info = [];
-		foreach($users as $key){
-			if($key->roles[0] == "um_doctors"){
-				$key->roles[0] = "Doctor";
-			}
-			if($key->roles[0] == "um_groomers"){
-				$key->roles[0] = "Groomer";
-			}
-			$array = [
-				'ID' => $key->ID,
-				'name'=>$key->display_name,
-				'role'=>$key->roles[0]
-			];
-			array_push($info,$array);
-		}
-		return $info;
-
-	}
-
-	function getPets(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_pets';
-		$results = $wpdb->get_results("SELECT * FROM {$table}");
-		$info = [];
-		foreach ($results as $key){
-			$owner_info = get_userdata($key->owner_id);
-
-			$arr = [
-				'pet_id'=>  $key->pet_id,
-				'owner_id' => $key->owner_id,
-				'pet_image'=> $key->pet_image,
-				'pet_name'=> $key->pet_name,
-				'pet_type'=> $key->pet_type,
-				'pet_breed'=>$key->pet_breed,
-				'pet_birthdate'=>$key->pet_birthdate,
-				'pet_color'=>$key->pet_color,
-				'pet_weight'=>$key->pet_weight,
-				'pet_gender'=>$key->pet_gender,
-				'owner_info'=> $owner_info->display_name
-			];
-			array_push($info,$arr);
-
-		}
-		return $info;
-	}
+	return $info;
+}
 	// function getDoctors(){
 	// 	global $wpdb;
 	// 	$table=$wpdb->prefix.'vet_doctors';
@@ -356,117 +366,117 @@
 	// 	}
 	// 	return $info;
 	// }
-	function addnewEmployee(){
-		global $wp,$wpdb;
-		$table=$wpdb->prefix.'users';
-		$data = json_decode(file_get_contents("php://input"));
-		$results = $wpdb->get_results("SELECT * FROM {$table} WHERE user_email = '{$data->email}' ");
-		if($data->role == "Doctor"){
-			$data->role = "um_doctors";
-		}else{
-			$data->role = "um_groomers";
-		}
-		if(count($results) > 0){
-			return array('status'=>404,'message'=>'Email Already Used');
-		}else{
-			$user = wp_insert_user(array(
-				'user_login'  =>  $data->uname,
-				'user_email'  =>  $data->email,
-				'user_pass'   =>  $data->pass,
-				'role'        =>  $data->role,
-				'first_name' => $data->firstName,
-				'last_name' => $data->lastName,
-			));
-			add_user_meta($user,'address',$data->address);
-			add_user_meta($user,'mobile_number',$data->mobileNumber);
-			add_user_meta($user,'telephone_number',$data->landlineNumber);
-			add_user_meta($user,'birthdate',$data->birthdate);
-			add_user_meta($user,'gender',$data->gender);
-			add_user_meta($user,'clinic_id',$data->clinic_id);
-
-			if( !is_wp_error( $user ) ){
-				return array('status'=>200,'message'=>'Data Created', 'user'=>$user);
-			} else {		
-        // success message
-				
-				return array('status'=>405,'message'=>'Username Already Exist');
-			}
-
-			
-
-		}
-		
+function addnewEmployee(){
+	global $wp,$wpdb;
+	$table=$wpdb->prefix.'users';
+	$data = json_decode(file_get_contents("php://input"));
+	$results = $wpdb->get_results("SELECT * FROM {$table} WHERE user_email = '{$data->email}' ");
+	if($data->role == "Doctor"){
+		$data->role = "um_doctors";
+	}else{
+		$data->role = "um_groomers";
 	}
-	function getDoctors($data){
-		global $wp;
-		$userinfo = get_userdata($data['id']);
-		if($userinfo->roles[0] == "um_doctors"){
-			$userinfo->roles[0] = "Doctor";
-		}
-		if($userinfo->roles[0] == "um_groomers"){
-			$userinfo->roles[0] = "Groomer";
-		}
-		$arr = [
-			'doctor_id'=>  $userinfo->ID ,
-			'last_name' => $userinfo->last_name,
-			'first_name'=> $userinfo->first_name,
-			'address'=> $userinfo->address,
-			'mobile_no'=> $userinfo->mobile_number,
-			'landline_no'=>$userinfo->telephone_number,
-			'birthdate'=>$userinfo->birthdate,
-			'gender'=>$userinfo->gender,
-			'email'=>$userinfo->user_email,
-			'role'=>$userinfo->roles[0]
-		];
-
-		return $arr;
-	}
-	function updateDoctors(){
-		global $wp;
-		$lastName = isset( $_POST['lastName'] ) ? sanitize_text_field( $_POST['lastName'] ) : '';
-		$firstName = isset( $_POST['firstName'] ) ? sanitize_text_field( $_POST['firstName'] ) : '';
-		$address = isset( $_POST['address'] ) ? sanitize_text_field( $_POST['address'] ) : '';
-		$mobileNumber = isset( $_POST['mobileNumber'] ) ? sanitize_text_field( $_POST['mobileNumber'] ) : '';
-		$landlineNumber = isset( $_POST['landlineNumber'] ) ? sanitize_text_field( $_POST['landlineNumber'] ) : '';
-		$birthdate = isset( $_POST['birthdate'] ) ? sanitize_text_field( $_POST['birthdate'] ) : '';
-		$gender = isset( $_POST['gender'] ) ? sanitize_text_field( $_POST['gender'] ) : '';
-		$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
-		$doctor_id = isset( $_POST['doctor_id'] ) ? sanitize_text_field( $_POST['doctor_id'] ) : '';
-		$role = isset( $_POST['role'] ) ? sanitize_text_field( $_POST['role'] ) : '';
-		$userinfo = get_userdata($doctor_id);
-		if($role == "Doctor"){
-			$role = "um_doctors";
-		}
-		if($role == "Groomer"){
-			$role = "um_groomers";
-		}
-		$user_data = wp_update_user(array(
-			'ID'=>$doctor_id,
-			'last_name' => $lastName,
-			'first_name'=> $firstName,
-			'user_email'=>$email,
+	if(count($results) > 0){
+		return array('status'=>404,'message'=>'Email Already Used');
+	}else{
+		$user = wp_insert_user(array(
+			'user_login'  =>  $data->uname,
+			'user_email'  =>  $data->email,
+			'user_pass'   =>  $data->pass,
+			'role'        =>  $data->role,
+			'first_name' => $data->firstName,
+			'last_name' => $data->lastName,
 		));
-		$u = new WP_User($doctor_id);
-		$u->remove_role($userinfo->roles[0]);
-		$u->add_role($role);
-		$metas = array( 
-			'address'=> $address,
-			'mobile_number'=> $mobileNumber,
-			'telephone_number'=>$landlineNumber,
-			'birthdate'=>$birthdate,
-			'gender'=>$gender
-		);
-		foreach($metas as $key => $value) {
-			update_user_meta( $doctor_id, $key, $value );
+		add_user_meta($user,'address',$data->address);
+		add_user_meta($user,'mobile_number',$data->mobileNumber);
+		add_user_meta($user,'telephone_number',$data->landlineNumber);
+		add_user_meta($user,'birthdate',$data->birthdate);
+		add_user_meta($user,'gender',$data->gender);
+		add_user_meta($user,'clinic_id',$data->clinic_id);
+
+		if( !is_wp_error( $user ) ){
+			return array('status'=>200,'message'=>'Data Created', 'user'=>$user);
+		} else {		
+        // success message
+			
+			return array('status'=>405,'message'=>'Username Already Exist');
 		}
-		if ( is_wp_error( $user_data ) ) {
-	        // There was an error; possibly this user doesn't exist.
-			echo 'Error.';
-		} else {
-	        // Success!
-			return array('status'=>200,'message'=>'OK');
-		}
+
+		
+
 	}
+	
+}
+function getDoctors($data){
+	global $wp;
+	$userinfo = get_userdata($data['id']);
+	if($userinfo->roles[0] == "um_doctors"){
+		$userinfo->roles[0] = "Doctor";
+	}
+	if($userinfo->roles[0] == "um_groomers"){
+		$userinfo->roles[0] = "Groomer";
+	}
+	$arr = [
+		'doctor_id'=>  $userinfo->ID ,
+		'last_name' => $userinfo->last_name,
+		'first_name'=> $userinfo->first_name,
+		'address'=> $userinfo->address,
+		'mobile_no'=> $userinfo->mobile_number,
+		'landline_no'=>$userinfo->telephone_number,
+		'birthdate'=>$userinfo->birthdate,
+		'gender'=>$userinfo->gender,
+		'email'=>$userinfo->user_email,
+		'role'=>$userinfo->roles[0]
+	];
+
+	return $arr;
+}
+function updateDoctors(){
+	global $wp;
+	$lastName = isset( $_POST['lastName'] ) ? sanitize_text_field( $_POST['lastName'] ) : '';
+	$firstName = isset( $_POST['firstName'] ) ? sanitize_text_field( $_POST['firstName'] ) : '';
+	$address = isset( $_POST['address'] ) ? sanitize_text_field( $_POST['address'] ) : '';
+	$mobileNumber = isset( $_POST['mobileNumber'] ) ? sanitize_text_field( $_POST['mobileNumber'] ) : '';
+	$landlineNumber = isset( $_POST['landlineNumber'] ) ? sanitize_text_field( $_POST['landlineNumber'] ) : '';
+	$birthdate = isset( $_POST['birthdate'] ) ? sanitize_text_field( $_POST['birthdate'] ) : '';
+	$gender = isset( $_POST['gender'] ) ? sanitize_text_field( $_POST['gender'] ) : '';
+	$email = isset( $_POST['email'] ) ? sanitize_text_field( $_POST['email'] ) : '';
+	$doctor_id = isset( $_POST['doctor_id'] ) ? sanitize_text_field( $_POST['doctor_id'] ) : '';
+	$role = isset( $_POST['role'] ) ? sanitize_text_field( $_POST['role'] ) : '';
+	$userinfo = get_userdata($doctor_id);
+	if($role == "Doctor"){
+		$role = "um_doctors";
+	}
+	if($role == "Groomer"){
+		$role = "um_groomers";
+	}
+	$user_data = wp_update_user(array(
+		'ID'=>$doctor_id,
+		'last_name' => $lastName,
+		'first_name'=> $firstName,
+		'user_email'=>$email,
+	));
+	$u = new WP_User($doctor_id);
+	$u->remove_role($userinfo->roles[0]);
+	$u->add_role($role);
+	$metas = array( 
+		'address'=> $address,
+		'mobile_number'=> $mobileNumber,
+		'telephone_number'=>$landlineNumber,
+		'birthdate'=>$birthdate,
+		'gender'=>$gender
+	);
+	foreach($metas as $key => $value) {
+		update_user_meta( $doctor_id, $key, $value );
+	}
+	if ( is_wp_error( $user_data ) ) {
+	        // There was an error; possibly this user doesn't exist.
+		echo 'Error.';
+	} else {
+	        // Success!
+		return array('status'=>200,'message'=>'OK');
+	}
+}
 	// function updateDoctors(){
 	// 	global $wpdb;
 	// 	$table=$wpdb->prefix.'vet_doctors';
@@ -496,115 +506,115 @@
 	// 	$wpdb->update( $table, $update_data,$where,array('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'));
 
 	// }
-	function delete_doctor(){
-		global $wpdb,$wp;
-		$table=$wpdb->prefix.'users';
+function delete_doctor(){
+	global $wpdb,$wp;
+	$table=$wpdb->prefix.'users';
 
-		if($_POST['action']=="delete"){
-			$doctor_id = isset( $_POST['doctor_id'] ) ? sanitize_text_field( $_POST['doctor_id'] ) : '';
+	if($_POST['action']=="delete"){
+		$doctor_id = isset( $_POST['doctor_id'] ) ? sanitize_text_field( $_POST['doctor_id'] ) : '';
 			// wp_delete_user($doctor_id); 
-			$wpdb->delete( $table, array( 'ID' => $doctor_id ) );
-			return array('status'=>200,'message'=>'OK');
+		$wpdb->delete( $table, array( 'ID' => $doctor_id ) );
+		return array('status'=>200,'message'=>'OK');
 			// historyInsert(["action"=>"Deleted Pets Details ". $appointment_id]);
-		}
-
 	}
-	function updatePets(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_pets';
-		$up_pet_id = isset( $_POST['up_pet_id'] ) ? sanitize_text_field( $_POST['up_pet_id'] ) : '';
-		$up_ownerID = isset( $_POST['up_ownerID'] ) ? sanitize_text_field( $_POST['up_ownerID'] ) : '';
-		$up_petBreed = isset( $_POST['up_petBreed'] ) ? sanitize_text_field( $_POST['up_petBreed'] ) : '';
-		$up_petType = isset( $_POST['up_petType'] ) ? sanitize_text_field( $_POST['up_petType'] ) : '';
-		$up_petName = isset( $_POST['up_petName'] ) ? sanitize_text_field( $_POST['up_petName'] ) : '';
-		$up_petColor = isset( $_POST['up_petColor'] ) ? sanitize_text_field( $_POST['up_petColor'] ) : '';
-		$up_petGender = isset( $_POST['up_petGender'] ) ? sanitize_text_field( $_POST['up_petGender'] ) : '';
-		$up_petWeight = isset( $_POST['up_petWeight'] ) ? sanitize_text_field( $_POST['up_petWeight'] ) : '';
-		$up_petBirthdate = isset( $_POST['up_petBirthdate'] ) ? sanitize_text_field( $_POST['up_petBirthdate'] ) : '';
-		$up_pet_image = isset( $_POST['up_pet_image'] ) ? sanitize_text_field( $_POST['up_pet_image'] ) : '';
 
-		$update_data=array(
-			'owner_id' => $up_ownerID,
-			'pet_image'=> $up_pet_image,
-			'pet_name'=> $up_petName,
-			'pet_type'=> $up_petType,
-			'pet_breed'=>$up_petBreed,
-			'pet_birthdate'=>$up_petBirthdate,
-			'pet_color'=>$up_petColor,
-			'pet_weight'=>$up_petWeight,
-			'pet_gender'=>$up_petGender
-		);
-		$where = array('pet_id' => $up_pet_id);
-		$wpdb->update( $table, $update_data,$where,array('%s','%s','%s','%s','%s','%s','%s','%s','%s'));
-		return array('status'=>200,'message'=>"OK");
-	}
-	function delete_pets(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_pets';
+}
+function updatePets(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_pets';
+	$up_pet_id = isset( $_POST['up_pet_id'] ) ? sanitize_text_field( $_POST['up_pet_id'] ) : '';
+	$up_ownerID = isset( $_POST['up_ownerID'] ) ? sanitize_text_field( $_POST['up_ownerID'] ) : '';
+	$up_petBreed = isset( $_POST['up_petBreed'] ) ? sanitize_text_field( $_POST['up_petBreed'] ) : '';
+	$up_petType = isset( $_POST['up_petType'] ) ? sanitize_text_field( $_POST['up_petType'] ) : '';
+	$up_petName = isset( $_POST['up_petName'] ) ? sanitize_text_field( $_POST['up_petName'] ) : '';
+	$up_petColor = isset( $_POST['up_petColor'] ) ? sanitize_text_field( $_POST['up_petColor'] ) : '';
+	$up_petGender = isset( $_POST['up_petGender'] ) ? sanitize_text_field( $_POST['up_petGender'] ) : '';
+	$up_petWeight = isset( $_POST['up_petWeight'] ) ? sanitize_text_field( $_POST['up_petWeight'] ) : '';
+	$up_petBirthdate = isset( $_POST['up_petBirthdate'] ) ? sanitize_text_field( $_POST['up_petBirthdate'] ) : '';
+	$up_pet_image = isset( $_POST['up_pet_image'] ) ? sanitize_text_field( $_POST['up_pet_image'] ) : '';
 
-		if($_POST['action']=="delete"){
-			$pet_id = isset( $_POST['pet_id'] ) ? sanitize_text_field( $_POST['pet_id'] ) : '';
-			$ID = array('pet_id' => $pet_id);
-			$wpdb->delete( $table, $ID);
+	$update_data=array(
+		'owner_id' => $up_ownerID,
+		'pet_image'=> $up_pet_image,
+		'pet_name'=> $up_petName,
+		'pet_type'=> $up_petType,
+		'pet_breed'=>$up_petBreed,
+		'pet_birthdate'=>$up_petBirthdate,
+		'pet_color'=>$up_petColor,
+		'pet_weight'=>$up_petWeight,
+		'pet_gender'=>$up_petGender
+	);
+	$where = array('pet_id' => $up_pet_id);
+	$wpdb->update( $table, $update_data,$where,array('%s','%s','%s','%s','%s','%s','%s','%s','%s'));
+	return array('status'=>200,'message'=>"OK");
+}
+function delete_pets(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_pets';
+
+	if($_POST['action']=="delete"){
+		$pet_id = isset( $_POST['pet_id'] ) ? sanitize_text_field( $_POST['pet_id'] ) : '';
+		$ID = array('pet_id' => $pet_id);
+		$wpdb->delete( $table, $ID);
 			// historyInsert(["action"=>"Deleted Pets Details ". $appointment_id]);
-		}
+	}
 
-	}
-	function insertwaiver(){
-		global $wpdb;
-		$data = json_decode(file_get_contents("php://input"));
-		$table=$wpdb->prefix.'vet_waiver';
-		$waiver_title =$data->waiver_title;
-		$waiver_content = $data->waiver_content;
-		$clinic_id = $data->clinic_id;
-		$post_data=array(
-			'waiver_id'=>NULL,
-			'waiver_title'=> $waiver_title,
-			'waiver_content'=> $waiver_content,
-			'clinic_id' => $clinic_id
-		);
+}
+function insertwaiver(){
+	global $wpdb;
+	$data = json_decode(file_get_contents("php://input"));
+	$table=$wpdb->prefix.'vet_waiver';
+	$waiver_title =$data->waiver_title;
+	$waiver_content = $data->waiver_content;
+	$clinic_id = $data->clinic_id;
+	$post_data=array(
+		'waiver_id'=>NULL,
+		'waiver_title'=> $waiver_title,
+		'waiver_content'=> $waiver_content,
+		'clinic_id' => $clinic_id
+	);
 
-		$wpdb->insert( $table, $post_data,array('%s','%s','%s'));
-		$page_url = home_url( $wp->request );
-		$redirect_to = add_query_arg($page_url);
-		wp_safe_redirect( $redirect_to );
-		exit;
-	}
-	function insertconsent(){
-		global $wpdb;
-		$table=$wpdb->prefix.'vet_consent';
-		$consent_title = isset( $_POST['consent_title'] ) ? sanitize_text_field( $_POST['consent_title'] ) : '';
-		$consent_content = isset( $_POST['consent_content'] ) ? sanitize_text_field( $_POST['consent_content'] ) : '';
+	$wpdb->insert( $table, $post_data,array('%s','%s','%s'));
+	$page_url = home_url( $wp->request );
+	$redirect_to = add_query_arg($page_url);
+	wp_safe_redirect( $redirect_to );
+	exit;
+}
+function insertconsent(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_consent';
+	$consent_title = isset( $_POST['consent_title'] ) ? sanitize_text_field( $_POST['consent_title'] ) : '';
+	$consent_content = isset( $_POST['consent_content'] ) ? sanitize_text_field( $_POST['consent_content'] ) : '';
 
-		$post_data=array(
-			'consent_id'=>NULL,
-			'consent_title'=> $consent_title,
-			'consent_content'=> $consent_content
-		);
-		$wpdb->insert( $table, $post_data,array('%s','%s','%s'));
-		$page_url = home_url( $wp->request );
-		$redirect_to = add_query_arg($page_url);
-		wp_safe_redirect( $redirect_to );
-		exit;
-	}
-	function get_waiverdatatable(){
-		global $wpdb;
-		$myclinic_id = isset( $_POST['clinic_id'] ) ? sanitize_text_field( $_POST['clinic_id'] ) : '';
-		$table=$wpdb->prefix.'vet_waiver';
-		$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$myclinic_id}");
-		$arrayData = ["data"=>[]];
-		foreach ($results as $key ) {
-			$arrayDatas = [$key->waiver_title,'<button type="button" class="btn btn-success" title="Edit" onclick="updateWaiver('.$key->waiver_id.')"><i class="far fa-edit"></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick="deleteWaiver('.$key->waiver_id.')"><i class="far fa-trash-alt"></i></button>'
-		];
-		array_push($arrayData['data'], $arrayDatas);
-	}
-	return $arrayData;
+	$post_data=array(
+		'consent_id'=>NULL,
+		'consent_title'=> $consent_title,
+		'consent_content'=> $consent_content
+	);
+	$wpdb->insert( $table, $post_data,array('%s','%s','%s'));
+	$page_url = home_url( $wp->request );
+	$redirect_to = add_query_arg($page_url);
+	wp_safe_redirect( $redirect_to );
+	exit;
+}
+function get_waiverdatatable(){
+	global $wpdb;
+	$myclinic_id = isset( $_POST['clinic_id'] ) ? sanitize_text_field( $_POST['clinic_id'] ) : '';
+	$table=$wpdb->prefix.'vet_waiver';
+	$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$myclinic_id}");
+	$arrayData = ["data"=>[]];
+	foreach ($results as $key ) {
+		$arrayDatas = [$key->waiver_title,'<button type="button" class="btn btn-success" title="Edit" onclick="updateWaiver('.$key->waiver_id.')"><i class="far fa-edit"></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick="deleteWaiver('.$key->waiver_id.')"><i class="far fa-trash-alt"></i></button>'
+	];
+	array_push($arrayData['data'], $arrayDatas);
+}
+return $arrayData;
 }
 function get_messagesdata(){
 	global $wpdb;
 	$table=$wpdb->prefix.'vet_sms';
 	$myclinic_id = isset( $_POST['clinic_id'] ) ? sanitize_text_field( $_POST['clinic_id'] ) : '';
-	$results = $wpdb->get_results("SELECT * FROM {$table}  ORDER BY sms_id  DESC");
+	$results = $wpdb->get_results("SELECT * FROM {$table}  where clinic_id = {$myclinic_id} ORDER BY sms_id  DESC");
 	$arrayData = ["data"=>[]];
 	foreach ($results as $key ) {
 		$arrayDatas = [$key->contact_number,$key->message,$key->date_to_send,'<span class="badge badge-pill badge-warning">'.$key->status.'</span>','<button class="btn btn-danger btn-sm" onclick=deletemessage('.$key->sms_id.')><i class="fa fa-trash-alt"></i></button>'
@@ -623,7 +633,7 @@ function get_statusfields(){
 	foreach ($results as $key ) {
 		$arrayDatas = [
 			$key->meta_key,
-			
+			$key->meta_value,
 			'<button type="button" class="btn btn-success" name="deletePet" title="Delete" onclick=updateStatusFields("'.$key->status_field_id.'","status")><i class="far fa-edit" ></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick=deleteStatusFields("'.$key->status_field_id.'","status")><i class="far fa-trash-alt" ></i></button>'
 		];
 		array_push($arrayData['data'], $arrayDatas);
@@ -637,7 +647,7 @@ function get_testfields(){
 	$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$myclinic_id} ");
 	$arrayData = ["data"=>[]];
 	foreach ($results as $key ) {
-		$arrayDatas = [$key->meta_key,'<button type="button" class="btn btn-success" name="deletePet" title="Delete" onclick=updateStatusFields("'.$key->test_field_id.'","test")><i class="far fa-edit" ></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick=deleteStatusFields("'.$key->test_field_id.'","test")><i class="far fa-trash-alt" ></i></button>'
+		$arrayDatas = [$key->meta_key,$key->meta_value,'<button type="button" class="btn btn-success" name="deletePet" title="Delete" onclick=updateStatusFields("'.$key->test_field_id.'","test")><i class="far fa-edit" ></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick=deleteStatusFields("'.$key->test_field_id.'","test")><i class="far fa-trash-alt" ></i></button>'
 	];
 	array_push($arrayData['data'], $arrayDatas);
 }
@@ -733,7 +743,6 @@ function deletemessage($data){
 
 	if($_POST['action']=="delete"){
 		$ID = array('sms_id' => $data['id']);
-		deleteBulkSMS($data['id']);
 		$wpdb->delete( $table, $ID);
 			// historyInsert(["action"=>"Deleted Pets Details ". $appointment_id]);
 	}
@@ -827,7 +836,7 @@ function fileslisttotable($data){
 function putOldAppInTable($data){
 	global $wpdb;
 	$table=$wpdb->prefix.'vet_appointments';
-	$past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = '".$data['id']."' ORDER BY start_date DESC");
+	$past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = '".$data['id']."' ORDER BY appointment_id DESC");
 	$arrayData = ["data"=>[]];
 	foreach ($past_med as $key ) {
 		$appointment_id = $key->appointment_id;
@@ -849,7 +858,8 @@ function putOldAppInTable($data){
 			'service'=>'<div class="d-flex w-100 justify-content-between">
 			<h5 class="mb-1">'.$key->service_name.'</h5>
 			</div>',
-			'remarks'=>$remarks
+			'remarks'=>$remarks,
+			'date_created'=>$key->date_created
 		];
 		array_push($arrayData['data'], $arrayDatas);
 	}
@@ -942,7 +952,6 @@ function insert_pets(){
 		'pet_gender' => $data->petGender,
 		'clinic_id' => $data->clinic_id
 	);
-		// var_dump($post_data);
 	$new_id = insert_some(['vet_pets',$post_data]);
 	$info = ['status'=>200,'d'=>'Success', 'id'=>$new_id];
 	return $info;
@@ -950,7 +959,6 @@ function insert_pets(){
 }
 function insertnewowner(){
 	$data = json_decode(file_get_contents("php://input"));
-			// var_dump($data);
 	$image = explode(',', $data->image);
 	$image_upload = base64_decode($image[1]);
 	$post_data=array(
@@ -967,7 +975,6 @@ function insertnewowner(){
 		'image'=>$data->image,
 		'clinic_id' => $data->clinic_id
 	);
-		// var_dump($data->image);
 	$attach_id = insert_some(['vet_owners',$post_data]);
 	$info = ['status'=>200,'d'=>'Success', 'id'=>$attach_id];
 	return $info;
@@ -1038,12 +1045,12 @@ function getpetsbyowner($data){
 }
 
 
-function searchPetsOwner(){
+function searchPetsOwner($data){
 	global $wpdb;
 	$table=$wpdb->prefix.'vet_pets';
 	$table_owners=$wpdb->prefix.'vet_owners';
-	$results = $wpdb->get_results("SELECT * FROM {$table}");
-	$owners = $wpdb->get_results("SELECT * FROM {$table_owners}");
+	$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = '".$data['id']."' ");
+	$owners = $wpdb->get_results("SELECT * FROM {$table_owners} where clinic_id = '".$data['id']."' ");
 	$info = [];
 	foreach ($results as $key){
 		$owner_info = get_userdata($key->owner_id);
@@ -1160,34 +1167,39 @@ function removeTestinAp(){
 
 }
 
-function getEmployees(){
+function getEmployees($data){
 	global $wpdb;
 	$usersall = get_users( [ 'role__in' => [ 'um_doctors', 'um_groomers'] ] );
 	$arrayData = ["data"=>[]];
+	
+	
 	foreach ($usersall as $key ) {
+		$clinic_id = get_user_meta($key->ID,'clinic_id',true);
 		if($key->roles[0] == "um_doctors"){
 			$key->roles[0] = "Doctor";
 		}
 		if($key->roles[0] == "um_groomers"){
 			$key->roles[0] = "Groomer";
 		}
-		$arrayDatas = [
-			$key->last_name,
-			$key->first_name,
-			$key->address,
-			$key->mobile_number,
-			$key->telephone_number,
-			$key->gender,
-			$key->user_email,
-			'<button type="button" class="btn btn-success" title="Edit" onclick="updateDoctor('.$key->ID.')"><i class="fas fa-edit"></i></button><button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick="deleteDoctor('.$key->ID.')"><i class="far fa-trash-alt" ></i></button>'
+		if($clinic_id == $data['id']){
+			$arrayDatas = [
+				$key->last_name,
+				$key->first_name,
+				$key->address,
+				$key->mobile_number,
+// 			$key->telephone_number,
+// 			$key->birthdate,
+				$key->gender,
+				$key->user_email,
+				$key->roles[0],
+				'<button type="button" class="btn btn-primary" title="Edit" onclick="updateDoctor('.$key->ID.')"><i class="fas fa-eye"></i></button> <button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick="deleteDoctor('.$key->ID.')"><i class="far fa-trash-alt" ></i></button>'
 
-		];
-		array_push($arrayData['data'], $arrayDatas);
+			];
+			array_push($arrayData['data'], $arrayDatas);
+		}
 	}
 	return $arrayData;
 }
-
-
 add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_styles' );
 function my_theme_enqueue_styles() {
 	if ( is_woocommerce() || is_checkout() || is_cart() ) {
@@ -1201,20 +1213,21 @@ function getAllProducts($datas){
 	$args     = array( 'post_type' => 'product', 'post_status' => 'publish', 'post_author'=>$datas['id'], 'posts_per_page' => -1 );
 	$products = get_posts( $args ); 
 	$data = [];
-// 	var_dump($datas['id']);
 	foreach ($products as $key ) {
 		if($key->post_author == $datas['id'] ){
 			$product = new WC_Product( $key->ID );
-			$arrayDatas = [
-				'product_id' => $key->ID,
-				'product_title' => $key->post_title,
-				'product_content' => $key->post_content,
-				'product_status' => $key->post_status,
-				'product_quantity' => $product->get_stock_quantity(),
-				'product_status' => $product->get_stock_status(),
-				'product_price' => $product->get_price()
-			];
-			array_push($data,$arrayDatas);
+			if($product->get_stock_quantity() > 1){
+				$arrayDatas = [
+					'product_id' => $key->ID,
+					'product_title' => $key->post_title,
+					'product_content' => $key->post_content,
+					'product_status' => $key->post_status,
+					'product_quantity' => $product->get_stock_quantity(),
+					'product_status' => $product->get_stock_status(),
+					'product_price' => $product->get_price()
+				];
+				array_push($data,$arrayDatas);
+			}
 		}
 	}
 
@@ -1438,15 +1451,99 @@ function getTransactions(){
 	$results = $wpdb->get_results("SELECT * FROM {$table} WHERE appointment_id = ".$appointment_id." ");
 	foreach ($results as $key ) {
 		$arrayDatas = [
-			date("F j, Y, g:i a",strtotime($key->payment_date)),
-			$key->amount,
-			$key->balance,
-			$key->status
+			'transaction_id' => $key->transaction_id,
+			'appointment_id' => $key->appointment_id,
+			'payment_date' => date("F j, Y, g:i a",strtotime($key->payment_date)),
+			'total' => number_format($key->total),
+			'balance' => number_format($key->balance),
+			'subtotal' => $key->subtotal,
+			'status' => $key->status,
+			'products' => unserialize($key->orders),
+			'deductions' => unserialize($key->deductions),
+			'owner_id' => $key->owner_id,
+			'action' => '<button type="button" class="btn btn-danger" name="deletePet" title="Delete" onclick="deletetransaction('.$key->transaction_id.')"><i class="far fa-trash-alt" ></i></button>'
 		];
 		array_push($arrayData['data'], $arrayDatas);
 	}
 	
 	return $arrayData;
+}
+
+function inserttransaction(){
+	global $wpdb,$wp;
+	$table=$wpdb->prefix.'vet_transactions';
+	$data = json_decode(file_get_contents("php://input"));
+	date_default_timezone_set("Asia/Manila");
+	$payment_date = date('Y-m-d h:i:s a');
+
+
+	$deductions_arr = [];
+	$orders_arr = [];
+	foreach ($data->deductions as $key ) {
+		$deduction = [
+			'payment_name' => $key->payment,
+			'amount' => $key->amount
+		];
+		array_push($deductions_arr,$deduction);
+	}
+	foreach ($data->orders as $key ) {
+		$product = [
+			'productname' => $key->productname,
+			'quantity' => $key->quantity,
+			'productprice' => $key->productprice,
+			'total' => $key->price
+		];
+		array_push($orders_arr,$product);
+	}
+
+	$orders = serialize($orders_arr);
+	$deductions = serialize($deductions_arr);
+
+	$post_data=array(
+		'transaction_id'=>NULL,
+		'appointment_id'=>$data->appointment_id,
+		'owner_id' => $data->owner_id,
+		'subtotal'=>$data->subtotal,
+		'total'=>$data->gross_total,
+		'orders'=>$orders,
+		'deductions'=>$deductions,
+		'balance'=>$data->balance,
+		'status' => $data->status,
+		'payment_date' => date('Y-m-d h:i:s a')
+	);
+	$coupon_id = insert_some(['vet_transactions',$post_data]);
+	$info = ['status'=>200,'message'=>'OK', 'id'=>$coupon_id];
+	return $info;
+}
+
+function gettransactionbyOwner($data){
+	global $wpdb,$wp;
+	$table=$wpdb->prefix.'vet_transactions';
+	$results = $wpdb->get_results("SELECT * FROM {$table} WHERE owner_id = ".$data['id']." group by appointment_id ORDER BY transaction_id DESC ");
+	$arrayData = ["data"=>[]];
+	foreach ($results as $key ) {
+		$arrayDatas = [
+			'payment_date'=>date("F j, Y, g:i a",strtotime($key->payment_date)),
+			'appointment_id' => $key->appointment_id,
+			'total'=>number_format($key->total),
+			'balance'=>number_format($key->balance),
+			'status' => $key->status
+		];
+		array_push($arrayData['data'], $arrayDatas);
+		
+	}
+	return $arrayData;
+}
+function delete_transaction(){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_transactions';
+	$data = json_decode(file_get_contents("php://input"));
+	if($data->action=="delete"){
+		$ID = array('transaction_id' => $data->transaction_id);
+		$wpdb->delete( $table, $ID);
+			// historyInsert(["action"=>"Deleted Pets Details ". $appointment_id]);
+	}
+	return array('status'=>200, 'message'=>'OK');
 }
 
 function getFieldData($table,$clinic_id){
@@ -1477,11 +1574,141 @@ function updateEachField(){
 	$wpdb->update( $table, $update_data,$where,array('%s','%s','%s'));
 	return array('status'=>200,'message'=>"OK",'data'=>$update_data);
 }
+
+function get_past_medical_services($data){
+	global $wpdb;
+	$table=$wpdb->prefix.'vet_appointments';
+	$generaltable=$wpdb->prefix.'vet_pet_general';
+	$testtable=$wpdb->prefix.'vet_pet_test';
+	$statustable=$wpdb->prefix.'vet_pet_status';
+	$diagtable=$wpdb->prefix.'vet_pet_diagnostics';
+	$attachtb=$wpdb->prefix.'vet_pet_attachments';
+	if($data['app_id'] !== 0){
+		$past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = ".$data['id']." AND appointment_id != ".$data['app_id']." AND service_name != 'Grooming' order by appointment_id DESC ");
+	}else{
+		$past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = ".$data['id']." AND service_name != 'Grooming' order by appointment_id DESC ");
+	}
+	
+	$arrayData = array();
+	$show = true; 
+	$showdiag = true;
+	$col1 = '';
+	$col2 = '';
+	$arrayData = ["data"=>[]];
+	foreach ($past_med as $key ) {
+		if($key->notes !== ''){
+			$notes  = $key->notes;
+		}
+		if($key->service_name == "Board"){
+			$key->service_name = "Board & Lodging";
+		}
+		$col1 = '<h1 style="font-weight: bold"><a href="<?php echo get_site_url()?>/appointment-details?id='.$key->appointment_id.'" style="text-decoration: none;color:black;font-size: 35px;">'.$key->service_name.'</a></h1>
+		<small class="mb-3" style="color:red;">'.date("l jS \of F Y",strtotime($key->start_date)).'</small>
+		<div class="row">
+		<div class="col-md-8">';
+		$generallist = $wpdb->get_results("SELECT * FROM {$generaltable} WHERE appointment_id = ".$key->appointment_id." ");
+		foreach ($generallist as $skey ) {
+			if($skey->temperature !== ""){
+				$show = true;
+			}else{
+				$show = false;
+			}
+		}
+		if($show == true){
+			$col1 .= '<h4 style="font-weight: bold;color:red">General</h5>';
+			foreach ($generallist as $skey ) {
+				if($skey->temperature !== ""){
+					$col1 .= '<p class="mb-1" >Temperature : '.$skey->temperature.' </p>
+					<p class="mb-1" >Weight : '.$skey->weight.' </p>';
+				}
+			}
+		}
+		$testlist = $wpdb->get_results("SELECT * FROM {$testtable} WHERE appointment_id = ".$key->appointment_id." group by meta_key");
+		if(count($testlist) > 0){
+			$col1 .= '
+			<h4 style="font-weight: bold;color:red">Test</h5>';
+		}
+		foreach ($testlist as $skey ) {
+			if($skey->meta_key !== ''){
+				$col1 .= ' <p class="mb-1" >'.$skey->meta_key.' : '.$skey->meta_value.' </p> ';
+			}
+		}
+		$statuslist = $wpdb->get_results("SELECT * FROM {$statustable} WHERE appointment_id = ".$key->appointment_id." group by meta_key");
+		if(count($statuslist) > 0){
+			$col1 .= '
+			<h4 style="font-weight: bold;color:red">Status</h5>';
+		}
+		foreach ($statuslist as $skey ) {
+			if($skey->meta_key !== ''){
+				$col1 .= '<p class="mb-1" >'.$skey->meta_key.' : '.$skey->meta_value.'</p>';
+			}
+		}
+		$diaglist = $wpdb->get_results("SELECT * FROM {$diagtable} WHERE appointment_id = ".$key->appointment_id." ");
+		foreach ($diaglist as $skey ) {
+			if($skey->procedure_done !== ""){
+				$showdiag = true;
+			}else{
+				$showdiag = false;
+			}
+		}
+		if($showdiag == true){
+			$col1 .= ' 
+			<h4 style="font-weight: bold;color:red">Diagnostics</h5>';
+			foreach ($diaglist as $skey ) {
+				if($skey->procedure_done !== ""){
+					$col1 .= ' <p class="mb-1">Procedure : '.$skey->procedure_done.'</p>
+					<p class="mb-1">Tentative : '.$skey->tentative.'</p>
+					<p class="mb-1">Medication : '.$skey->medication.'</p>
+					<p class="mb-1">Prescription : '.$skey->prescription.'</p>';
+				}
+			}
+		}
+		if (!empty($notes)){
+			$col2 = '<h4 style="font-weight: bold;color:red">Notes</h5><span>'.$notes.'</span>';
+		}
+		$upload_dir = wp_upload_dir();
+		$results = $wpdb->get_results("SELECT * FROM {$attachtb} WHERE appointment_id = ".$key->appointment_id." ");
+		if(count($results) > 0){
+			$col2 .= '<h4 style="font-weight: bold;color:red">Attachments</h5>';
+		}
+		foreach ($results as $skey ) {
+			$location = $upload_dir['baseurl'] .'/'. $skey->uploaded_file;
+			$col2 .= "<span><a href=".$location." target='_blank'>".$skey->uploaded_file."</a></span> <br>";
+		}
+		$arrayDatas = [
+			'col1'=>$col1,
+			'col2'=>$col2,
+		];
+		array_push($arrayData['data'], $arrayDatas);
+	}
+	return $arrayData;
+}
 add_action('rest_api_init',function(){
+	
+	register_rest_route('vet/v1' , 'past/medical/(?P<id>\d+)/(?P<app_id>\d+)',[
+		'methods' => 'GET',
+		'callback' => 'get_past_medical_services',
+	]);
+
 	register_rest_route('vet/v1' , 'field/update',[
 		'methods' => 'POST',
 		'callback' => 'updateEachField',
 	]);
+	register_rest_route('vet/v1' , 'transaction/removeeach',[
+		'methods' => 'POST',
+		'callback' => 'delete_transaction',
+	]);
+
+	register_rest_route('vet/v1' , 'transaction/(?P<id>\d+)',[
+		'methods' => 'GET',
+		'callback' => 'gettransactionbyOwner',
+	]);
+
+	register_rest_route('vet/v1' , 'new/transaction',[
+		'methods' => 'POST',
+		'callback' => 'inserttransaction',
+	]);
+
 	register_rest_route('vet/v1' , 'transactions',[
 		'methods' => 'POST',
 		'callback' => 'getTransactions',
@@ -1561,7 +1788,7 @@ add_action('rest_api_init',function(){
 		'callback' => 'insertnewowner',
 	]);
 
-	register_rest_route('vet/v1' , 'search',[
+	register_rest_route('vet/v1' , 'search/(?P<id>\d+)',[
 		'methods' => 'GET',
 		'callback' => 'searchPetsOwner',
 	]);
@@ -1670,7 +1897,7 @@ add_action('rest_api_init',function(){
 		'methods' => 'GET',
 		'callback' => 'putOldAppInTable',
 	]);
-	
+
 	register_rest_route('vet/v1' , 'employees',[
 		'methods' => 'POST',
 		'callback' => 'wp_list_users',
@@ -1688,7 +1915,7 @@ add_action('rest_api_init',function(){
 		'methods' => 'POST',
 		'callback' => 'removeTestinAp',
 	]);
-	register_rest_route('vet/v1' , 'employeetable',[
+	register_rest_route('vet/v1' , 'employeetable/(?P<id>\d+)',[
 		'methods' => 'GET',
 		'callback' => 'getEmployees',
 	]);
@@ -1709,7 +1936,7 @@ add_action('rest_api_init',function(){
 		'methods' => 'POST',
 		'callback' => 'display_products',
 	]);
-	
+
 	register_rest_route('vet/v1' , 'modify/product',[
 		'methods' => 'POST',
 		'callback' => 'modifyProduct',
@@ -1727,26 +1954,9 @@ add_action('rest_api_init',function(){
 });
 
 add_action('wp_logout','auto_redirect_after_logout');
-
 function auto_redirect_after_logout(){
-	wp_safe_redirect( home_url() );
+	wp_redirect( home_url() );
 	exit;
 }
 
-function getmyclinicid(){
-global $wpdb;$current_user; wp_get_current_user();
-$user = get_userdata( get_current_user_id());
-$ID = get_current_user_id();
-$user_roles = $user->roles;
-if(!empty($user_roles)){
-  if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
-    $myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
-  }else if(in_array( 'um_clinic', $user_roles, true )){
-    $myclinic_id = get_current_user_id();
-  }else{
-    $myclinic_id = get_current_user_id();
-  }
-}
-return $myclinic_id;
-}
 ?>

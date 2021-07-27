@@ -1,7 +1,8 @@
 <?php include "page-header.php"; ?>
 <?php include "page-sidebar.php"; ?>
 <?php
-global $post, $current_user; wp_get_current_user();
+
+global $wpdb,$wp,$post, $current_user; wp_get_current_user();
 $user = get_userdata( get_current_user_id());
 $ID = get_current_user_id();
 $user_roles = $user->roles;
@@ -121,7 +122,7 @@ if(!empty($user_roles)){
 										foreach ($results as $key ) {
 											?>
 											<tr>
-												<td style="width: '100%'; height: '100%';background: url('<?php echo $key->image; ?>') no-repeat center center /cover"></td>
+												<td style="width: 150px; height: 100px;background: url('<?php echo $key->image; ?>') no-repeat center center /cover"></td>
 												<td><?php echo $key->last_name;?></td>
 												<td><?php echo $key->first_name;?></td>
 												
@@ -213,7 +214,7 @@ if(!empty($user_roles)){
 
 
 											</div>
-											<button type="button" class="btn btn-primary float-right mb-3 " name="addownerbutton" id="addownerbutton"><i class="fas fa-plus"></i> Add Owner</button>
+											<button type="submit" class="btn btn-primary float-right mb-3 " name="addownerbutton" id="addownerbutton"><i class="fas fa-plus"></i> Add Owner</button>
 										</form>
 
 									</div><!--/tab-pane-->
@@ -295,7 +296,8 @@ if(!empty($user_roles)){
 			});
 			Webcam.attach( '#my_camera' );
 		});
-		$('#addownerbutton').click(function(){
+		$('#newownerdetails').submit(function(e){
+		    e.preventDefault();
 			let newownerdetails = {};
 			$('#newownerdetails').serializeArray().forEach(x=>{
 				newownerdetails[x.name] = x.value;
@@ -315,18 +317,19 @@ if(!empty($user_roles)){
 					method:"POST",
 					body: JSON.stringify(newownerdetails)
 				}).then(res=>res.json()).then(res=>{
-          // console.log(res);
-          if(res.d=="Success"){
-          	Swal.fire({
-          		position: 'top-end',
-          		icon: 'success',
-          		title: 'Added New Owner Successfully',
-          		showConfirmButton: false,
-          		timer: 1500
-          	});
-          	location.assign("<?php echo get_site_url();?>/owners-details?id="+res.id);
-          }
-      });
+                  // console.log(res);
+                  if(res.d=="Success"){
+                  	Swal.fire({
+                  		position: 'top-end',
+                  		icon: 'success',
+                  		title: 'Added New Owner Successfully',
+                  		showConfirmButton: false,
+                  		timer: 1500
+                  	});
+                  	location.assign("<?php echo get_site_url();?>/owners-details?id="+res.id);
+                  }
+                });
+    // console.log(newownerdetails);
 			}
 		})
 	});
@@ -352,7 +355,7 @@ function capture_again(){
 		image_format: 'jpeg',
 		jpeg_quality: 100,
 		force_flash:false,
-		flip_horiz:true,
+		flip_horiz:false,
 		fps:45
 	});
 	Webcam.attach( '#my_camera' );
@@ -408,10 +411,6 @@ function updateOwner(id){
 		console.log(response);
 		content+=`<form action="" method="POST" class="needs-validation" id="updateDoctor_form" novalidate>
 		<div class="form-row">
-		<div class="col-md-6 mb-2" hidden>
-		<label for="last_name">Image</label>
-		<input type="text" class="form-control" id="owner_pic" value="${response[0].image}" name="owner_pic" required>
-		</div>
 		<div class="col-md-6 mb-2">
 		<label for="last_name">Last Name</label>
 		<input type="text" class="form-control" id="last_name" placeholder="Last Name" value="${response[0].last_name}" name="lastName" required>
@@ -525,5 +524,5 @@ function deleteOwner(id){
 			});
 		}
 	})
-}
+} 
 </script>

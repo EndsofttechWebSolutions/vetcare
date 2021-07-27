@@ -2568,5 +2568,10 @@ let dogs = [
     "name": "Yorkshire Terrier",
     "origin": "United Kingdom (England)",
     "imageURL": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Yorkshire_Terrier_WA_Mozart_Dolce_Sinfonia.jpg"
+  },
+  {
+    "name": "Mix Breed",
+    "origin": "Any",
+    "imageURL": ""
   }
 ]

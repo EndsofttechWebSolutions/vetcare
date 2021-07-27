@@ -16,8 +16,8 @@ if(!empty($user_roles)){
   }
 }
 if(!empty($user_roles)){
-  if (in_array( 'um_clinic', $user_roles, true ) || in_array( 'um_doctors', $user_roles, true )  || in_array( 'um_groomers', $user_roles, true ) ) {
-    $clinic_name = get_user_meta($myclinic_id,'first_name',true).' '.get_user_meta($myclinic_id,'last_name',true);
+  if (in_array( 'um_clinic', $user_roles, true ) ) {
+    $clinic_name = $user->display_name;
     $clinic_address = get_user_meta($myclinic_id,'address',true);
     $mobile_number = get_user_meta($myclinic_id,'mobile_number',true);
     $landline = get_user_meta($myclinic_id,'landline',true);
@@ -73,9 +73,7 @@ $status_data = getFieldData('status',$myclinic_id);
 
           <!-- <a class="nav-item nav-link" id="nav-banner-tab" data-toggle="tab" href="#nav-banner" role="tab" aria-controls="nav-banner" aria-selected="false">Banner</a> -->
           <a class="nav-item nav-link" id="nav-appointment-tab" data-toggle="tab" href="#nav-appointment" role="tab" aria-controls="nav-appointment" aria-selected="false">Appointment Fields</a>
-          <?php if(get_site_url() == 'https://vaxilifecorp.com'){ ?>
-            <a class="nav-item nav-link" id="nav-consent-tab" data-toggle="tab" href="#nav-consent" role="tab" aria-controls="nav-consent" aria-selected="false">Inventory</a>
-          <?php   } ?>
+          <a class="nav-item nav-link" id="nav-consent-tab" data-toggle="tab" href="#nav-consent" role="tab" aria-controls="nav-consent" aria-selected="false">Inventory</a>
         </div>
       </nav>
 
@@ -86,7 +84,7 @@ $status_data = getFieldData('status',$myclinic_id);
             <div class="form-row">
               <div class="col-md-12 mb-2">
                 <label for="owner_id">Clinic Name</label>
-                <input type="text" class="form-control" id="send_id" placeholder="Clinic Name" value="<?php echo $clinic_name;?>" name="clinic_name" readonly>
+                <input type="text" class="form-control" id="send_id" placeholder="Clinic Name" value="<?php echo $clinic_name;?>" name="clinic_name" required>
               </div>
               <div class="col-md-12 mb-2">
                 <label for="owner_id">Address</label>
@@ -149,11 +147,11 @@ $status_data = getFieldData('status',$myclinic_id);
                                     <label for="owner_id">Password</label>
                                     <input type="text" class="form-control" id="password" placeholder="Password" value="<?php echo $password_sms;?>" name="password" required>
                                   </div>
-                                  <!-- <div class="col-md-12 mb-2">
+                                  <div class="col-md-12 mb-2">
 
                                     <label for="owner_id">Sending Time</label>
                                     <input type="time" class="form-control" id="sendingtime" value="<?php echo $time_sms;?>" name="time_sms" required>
-                                  </div> -->
+                                  </div>
                                 </div>
                               </form>
                             </div>
@@ -290,7 +288,7 @@ $status_data = getFieldData('status',$myclinic_id);
 
         <div class="card-body">
           <div class="table-responsive">
-           <!--  <table class="table table-striped" id="inventoryTable" width="100%" cellspacing="0">
+            <table class="table table-striped" id="inventoryTable" width="100%" cellspacing="0">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -302,7 +300,7 @@ $status_data = getFieldData('status',$myclinic_id);
               </thead>
               <tbody>
               </tbody>
-            </table> -->
+            </table>
           </div>
         </div>
       </div>
@@ -322,10 +320,10 @@ $status_data = getFieldData('status',$myclinic_id);
               <div class="list-group" id="list-tab" role="tablist">
                 <a class="list-group-item list-group-item-action active" id="list-status-list" data-toggle="list" href="#list-status" role="tab" aria-controls="status">Status</a>
                 <a class="list-group-item list-group-item-action" id="list-test-list" data-toggle="list" href="#list-test" role="tab" aria-controls="test">Test</a>
-                <?php if(get_site_url() == 'https://vaxilifecorp.com'){ ?>
+                <?php //if(get_site_url() == 'https://vaxilifecorp.com'){ ?>
                   <a class="list-group-item list-group-item-action" id="list-tax-list" data-toggle="list" href="#list-tax" role="tab" aria-controls="test">Tax Settings</a>
-                  <!--<a class="list-group-item list-group-item-action" id="list-tax-list" data-toggle="list" href="#list-discount" role="tab" aria-controls="test">Discount Settings</a>-->
-                <?php } ?>
+                  <a class="list-group-item list-group-item-action" id="list-tax-list" data-toggle="list" href="#list-discount" role="tab" aria-controls="test">Discount Settings</a>
+                <?php //} ?>
               </div>
             </div>
             <div class="col-8">
@@ -338,7 +336,7 @@ $status_data = getFieldData('status',$myclinic_id);
                       <thead>
                         <tr>
                           <th>Fields</th>
-                          <!-- <th>Price</th> -->
+                          <th>Price</th>
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -354,7 +352,7 @@ $status_data = getFieldData('status',$myclinic_id);
                     <thead>
                       <tr>
                         <th>Fields</th>
-                        <!-- <th>Price</th> -->
+                        <th>Price</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -955,24 +953,31 @@ $status_data = getFieldData('status',$myclinic_id);
         data[x.name] = x.value;
       });
       console.log(data);
-      $.ajax({
-        url: url+"clinicupdate",
-        data:JSON.stringify(data),
-        type: 'post',
-        dataType: 'json',
-        success: function(response) {
-          if(response.message == "OK"){
-            Swal.fire({
-              position: 'top-end',
-              icon: 'success',
-              title: 'Clinic Details Updated!',
-              showConfirmButton: false,
-              timer: 1500
-            })
-          }
-        }
-      });
-    });
+//          fetch(url+'clinicupdate',{
+//              method:"POST",
+//              body:JSON.stringify(data)
+//          }).then(res=>{
+//              return res.json();
+//          });
+$.ajax({
+  url: url+"clinicupdate",
+  data:JSON.stringify(data),
+  type: 'post',
+  dataType: 'json',
+  success: function(response) {
+    if(response.message == "OK"){
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Clinic Details Updated!',
+        showConfirmButton: false,
+        timer: 1500
+      })
+                //      location.reload();
+              }
+            }
+          });
+});
 
     $('#savetax').click(function(){
       let taxvalue = $('#taxvalue').val();
@@ -1447,7 +1452,7 @@ function addwaiver(){
 
       function reloadwaiver(){
         waiver = [];
-        fetch(url+"waiver").then(res=>res.json()).then(res=>{
+        fetch(url+"waiver/<?php echo $myclinic_id;?>").then(res=>res.json()).then(res=>{
           waiver = res;
         });
       }
@@ -1497,9 +1502,9 @@ function addwaiver(){
         datas[x.name] = x.value;
       });
        datas['author_id'] = '<?php echo $myclinic_id;?>';
-       console.log(datas);
-
-       if(datas['content'] !== "" && datas['price'] !== "" && datas['product_name'] !== "" && datas['stock'] !== ""){
+      
+       if( datas['price'] !== "" && datas['product_name'] !== "" && datas['stock'] !== ""){
+        $('#inventory_form').modal('hide');
         $.ajax({
           url: url+"products",
           data:JSON.stringify(datas),
@@ -1645,8 +1650,20 @@ function addwaiver(){
      let inventoryTable = $('#inventoryTable').DataTable();
      let data = {
       product_id : id,
-      action:'delete'};
-      $.ajax({
+      action:'delete'
+      };
+      
+      Swal.fire({
+          title: 'Are you sure?',
+          text: "Once deleted, you will not be able to recover this details!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.value) {
+            $.ajax({
         url: url+"modify/product",
         data:JSON.stringify(data),
         type: 'post',
@@ -1665,6 +1682,9 @@ function addwaiver(){
               }
             }
           });
+          }
+        });
+      
     }
 
     function updateTax(id){

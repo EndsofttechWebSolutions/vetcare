@@ -27,7 +27,6 @@ foreach ($petinfo as $key ) {
   $pet_gender = $key->pet_gender;
   $pet_bday = $key->pet_birthdate;
   $pet_weight = $key->pet_weight;
-  $pet_type = $key->pet_type;
 
   $age = date_diff(date_create(), date_create($pet_bday));
   $age = $age->format("%Y Year, %M Months, %d Days");
@@ -47,11 +46,11 @@ foreach ($past_med as $key ) {
 }
 ?>
 <style>
-  td.highlight {
-    background-color: whitesmoke !important;
-  }
+td.highlight {
+  background-color: whitesmoke !important;
+}
 
-  #my_camera{
+#my_camera{
     /*width: 265px;
     height: 240px;*/
     border: 1px solid black;
@@ -69,19 +68,19 @@ foreach ($past_med as $key ) {
     overflow: auto;
     overflow-x: hidden;
   }
-   @media screen and (min-width: 768px) {
-        .modal-dialog {
-          /*width: 700px;*/ /* New width for default modal */
-        }
-        .modal-sm {
-          width: 100%!important; /* New width for small modal */
-        }
+  @media screen and (min-width: 768px) {
+    .modal-dialog {
+      /*width: 700px;*/ /* New width for default modal */
     }
-    @media screen and (min-width: 992px) {
-        .modal-lg {
-         /* width: 1500px!important;*/ /* New width for large modal */
-        }
+    .modal-sm {
+      width: 100%!important; /* New width for small modal */
     }
+  }
+  @media screen and (min-width: 992px) {
+    .modal-lg {
+     /* width: 1500px!important;*/ /* New width for large modal */
+   }
+ }
 
 </style>
 <div id="layoutSidenav_content">
@@ -90,7 +89,7 @@ foreach ($past_med as $key ) {
 
       <h1 class="mt-4"></h1>
       <ol class="breadcrumb mb-2">
-        <li class="breadcrumb-item"><a href="<?php echo get_site_url();?>/add-owner"> Owners Lists</a></li>
+        <li class="breadcrumb-item"><a href="<?php echo get_site_url();?>/add-owner/?"> Owners Lists</a></li>
         <li class="breadcrumb-item" id="ownerlink">Owner Details</li>
         <li class="breadcrumb-item active">Pet Details</li>
       </ol>
@@ -117,7 +116,7 @@ foreach ($past_med as $key ) {
                           <th>Appointment Date</th>
                           <th>Appointment Name</th>
                           <th>Status</th>
-                          
+                          <th>Date Created</th>
                         </tr>
                       </thead>
                       
@@ -287,9 +286,9 @@ foreach ($past_med as $key ) {
                     <div class="col-md-12 mb-2">
                       <label for="staffs">Assigned To</label>
                       <select class="form-control" id="staffs" name="staffid">
-                        <option>Karl</option>
-                        <option>Niel</option>
-                        <option>Jorsen</option>
+                        <option>Staff1</option>
+                        <option>Staff2</option>
+                        <option>Staff3</option>
                       </select>
                       <div class="valid-feedback">
                         Looks good!
@@ -342,306 +341,182 @@ foreach ($past_med as $key ) {
           </button>
         </div>
         <div class="modal-body">
-          <ul class="list-group">
-            <?php
-            global $wpdb;
-            $past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = {$ID} AND service_name != 'Grooming' order by start_date DESC ");
-            $arrayData = array();
-            if(count($past_med) === 0){
-              ?>
-              <div class="col-md-12">
-                <div class="alert alert-danger" role="alert">
-                  No Results Found!
-                </div>
-              </div>  
-              <?php
-            }else{
-              foreach ($past_med as $key ) {
-                $appointment_id = $key->appointment_id;
-                if($key->service_name == "Board"){
-                  $key->service_name = "Board & Lodging";
-                }
-                ?>
-                <li class="list-group-item " style="margin: 10px;">
-                  <h1 style="font-weight: bold"><a href="<?php echo get_site_url()?>/appointment-details?id=<?php echo $appointment_id; ?>" style="text-decoration: none;color:black;font-size: 35px;"><?php echo $key->service_name;?></a></h1>
-                  <small class="mb-5" style="color:red;"><?php echo date('l jS \of F Y',strtotime($key->start_date));?></small>
-                  <div class="row">
-                    <div class="col-md-8">
-                      
-                      <?php
-                      global $wpdb;
-                      $generaltable=$wpdb->prefix.'vet_pet_general';
-                      $generallist = $wpdb->get_results("SELECT * FROM {$generaltable} WHERE appointment_id = ".$appointment_id." ");
-                      $arrayData = array();
-                      $show = true; 
-                      ?>
+          <div class="table-responsive">
+            <table class="table table-striped" id="past-medical-services" width="100%" cellspacing="0" style="cursor:pointer">
+              <thead>
+                <tr>
+                  <th>Service Name</th>
+                  <th>Notes & Attachments</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
 
-                      <?php foreach ($generallist as $skey ) {
-                        if($skey->temperature !== ""){
-                          $show = true;
-                        }else{
-                          $show = false;
-                        }
-                      } 
-                      if($show == true){
-                        ?>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                        <h4 style="font-weight: bold;color:red">General</h5>
+  <!-- Add Sub-Owner -->
+  <div class="modal fade" id="addowners" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Fill out Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-sm-3"><!--left col-->
+              <div class="text-center">
+                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
 
-                          <?php
-                          foreach ($generallist as $skey ) {
-                             if($skey->temperature !== ""){
-                            ?>
-                            <p class="mb-1" >Temperature : <?php echo $skey->temperature; ?> </p>
-                            <p class="mb-1" >Weight : <?php echo $skey->weight; ?> </p>
-                          <?php }
-                          }
-                        } ?>
-
-
-                        <?php
-                        global $wpdb;
-                        $testtable=$wpdb->prefix.'vet_pet_test';
-                        $testlist = $wpdb->get_results("SELECT * FROM {$testtable} WHERE appointment_id = ".$appointment_id." group by meta_key");
-                        $arrayData = array();
-                        ?>
-                        <?php if(count($testlist) > 0){ ?>
-                          <hr>
-                          <h4 style="font-weight: bold;color:red">Test</h5>
-                          <?php } ?>
-                          <?php
-                          foreach ($testlist as $skey ) {
-                            ?>
-                            <p class="mb-1" ><?php echo $skey->meta_key; ?> : <?php echo $skey->meta_value; ?> </p>
-                          <?php } ?>
-                          
-
-                          <?php
-                          global $wpdb;
-                          $statustable=$wpdb->prefix.'vet_pet_status';
-                          $statuslist = $wpdb->get_results("SELECT * FROM {$statustable} WHERE appointment_id = ".$appointment_id." group by meta_key");
-                          $arrayData = array();
-                          ?>
-                          <?php if(count($statuslist) > 0){ ?>
-                            <hr>
-                            <h4 style="font-weight: bold;color:red">Status</h5>
-                            <?php } ?>
-                            <?php
-                            foreach ($statuslist as $skey ) {
-                              ?>
-                              <p class="mb-1" ><?php echo $skey->meta_key; ?> : <?php echo $skey->meta_value; ?></p>
-                            <?php } ?>
-                            
-
-                            <?php
-                            global $wpdb;
-                            $statustable=$wpdb->prefix.'vet_pet_diagnostics';
-                            $statuslist = $wpdb->get_results("SELECT * FROM {$statustable} WHERE appointment_id = ".$appointment_id." ");
-                            $arrayData = array();
-                            $show = true;
-                            ?>
-                            <?php 
-                            foreach ($statuslist as $skey ) {
-                              if($skey->procedure_done !== ""){
-                                $show = true;
-                              }else{
-                                $show = false;
-                              }
-                            }
-                            if($show == true){ ?>
-                              <hr>  
-                              <h4 style="font-weight: bold;color:red">Diagnostics</h5>
-
-                                <?php
-                                foreach ($statuslist as $skey ) {
-                                  if($skey->procedure_done == ""){
-                                    $show = false;
-                                  }
-                                  ?>
-                                  <p class="mb-1">Procedure : <?php echo $skey->procedure_done; ?></p>
-                                  <p class="mb-1">Tentative : <?php echo $skey->tentative; ?></p>
-                                  <p class="mb-1">Medication : <?php echo $skey->medication; ?></p>
-                                  <p class="mb-1">Prescription : <?php echo $skey->prescription; ?></p>
-                                <?php }
-                              } ?>
-                            </div>  
-                            <div class="col-md-4">
-                              <?php if ($key->notes !== "" ): ?>
-                                <h4 style="font-weight: bold;color:red">Notes</h5>
-                                  <span><?php echo $key->notes; ?></span>
-                                <?php endif ?>
-                                
-                                
-
-                                <?php
-                                global $wpdb;
-                                $attachtb=$wpdb->prefix.'vet_pet_attachments';
-                                $upload_dir = wp_upload_dir();
-                                $results = $wpdb->get_results("SELECT * FROM {$attachtb} WHERE appointment_id = ".$appointment_id." ");
-                                ?>
-                                <?php if(count($results) > 0){ ?>
-                                  <hr>
-                                  <h4 style="font-weight: bold;color:red">Attachments</h5>
-                                  <?php } ?>
-                                  <?php
-                                  foreach ($results as $skey ) {
-                                    $location = $upload_dir['baseurl'] .'/'. $skey->uploaded_file;
-                                    echo "<span><a href=".$location." target='_blank'>".$skey->uploaded_file."</a></span> <br>";
-                                  }
-                                  ?>
-
-                                </div>  
-                              </div>
-                            </li>
-
-                            <?php 
-                          }
-                        } 
-                        ?>
-
-                      </ul>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Add Sub-Owner -->
-              <div class="modal fade" id="addowners" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">Fill out Details</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="row">
-                        <div class="col-sm-3"><!--left col-->
-                          <div class="text-center">
-                            <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
-
-                          </div></hr>
-                        </div><!--/col-3-->
-                        <div class="col-sm-9">
-                          <div class="tab-content">
-                            <div class="tab-pane active" id="home">
-                              <hr>
-                              <form action="" method="POST" class="needs-validation" id="newownerdetails" novalidate>
-                                <input type="file" class="text-center center-block file-upload" name="uploader" id="uploader"
-                                accept="image/*"
-                                capture="camera">
-                                <div class="form-row">
-                                  <div class="col-md-6 mb-2">
-                                    <label for="last_name">Last Name</label>
-                                    <input type="text" class="form-control" id="last_name" placeholder="Last Name" value="" name="lastName" required>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="first_name">First Name</label>
-                                    <input type="text" class="form-control" id="first_name" placeholder="Last Name" value="" name="firstName" required>
-                                  </div>
-                                  <div class="col-md-12 mb-2">
-                                    <label for="address">Address</label>
-                                    <input type="text" class="form-control" id="address" placeholder="Address" value="" name="address" required>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="gender">Gender</label>
-                                    <select class="custom-select" id="gender" name="gender">
-                                      <option value="Male">Male</option>
-                                      <option value="Female">Female</option>
-                                    </select>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" placeholder="Email" value="" name="email" required>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="number">Mobile No.</label>
-                                    <input type="number" class="form-control" id="number" placeholder="Mobile Number" value="" name="mobileNumber" required>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="landline_number">Landline No.</label>
-                                    <input type="number" class="form-control" id="landline_number" placeholder="Landline Number" value="" name="landlineNumber" required>
-                                  </div>
-                                  <div class="col-md-6 mb-2">
-                                    <label for="landline_number">Birthdate</label>
-                                    <input type="date" class="form-control" id="birthdate" placeholder="Birthdate" value="" name="birthDate" required>
-                                  </div>
-
-                                </div>
-                                <button type="button" class="btn btn-primary float-right" name="addownerbutton" id="addownerbutton" onclick="addowner()"><i class="fas fa-plus"></i> Add Owner</button>
-                              </form>
-
-                              <hr>
-
-                            </div><!--/tab-pane-->
-                          </div><!--/tab-content-->
-
-                        </div><!--/col-9-->
-                      </div><!--/row-->
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div></hr>
+            </div><!--/col-3-->
+            <div class="col-sm-9">
+              <div class="tab-content">
+                <div class="tab-pane active" id="home">
+                  <hr>
+                  <form action="" method="POST" class="needs-validation" id="newownerdetails" novalidate>
+                    <input type="file" class="text-center center-block file-upload" name="uploader" id="uploader"
+                    accept="image/*"
+                    capture="camera">
+                    <div class="form-row">
+                      <div class="col-md-6 mb-2">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" placeholder="Last Name" value="" name="lastName" required>
                       </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" placeholder="Last Name" value="" name="firstName" required>
+                      </div>
+                      <div class="col-md-12 mb-2">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" placeholder="Address" value="" name="address" required>
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="gender">Gender</label>
+                        <select class="custom-select" id="gender" name="gender">
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Email" value="" name="email" required>
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="number">Mobile No.</label>
+                        <input type="number" class="form-control" id="number" placeholder="Mobile Number" value="" name="mobileNumber" required>
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="landline_number">Landline No.</label>
+                        <input type="number" class="form-control" id="landline_number" placeholder="Landline Number" value="" name="landlineNumber" required>
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label for="landline_number">Birthdate</label>
+                        <input type="date" class="form-control" id="birthdate" placeholder="Birthdate" value="" name="birthDate" required>
+                      </div>
+
                     </div>
-                  </div>
-                </div>
-              </div>
-              <?php include "page-footer.php"; ?>
-              <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/dog-breed.js"></script>
-              <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/cat-breed.js"></script>
-              <script>
-                let image_data ='';
-                let id = <?php echo $_GET['id']; ?>;
-                pets = [];
-                $(document).ready(function(){
+                    <button type="button" class="btn btn-primary float-right" name="addownerbutton" id="addownerbutton" onclick="addowner()"><i class="fas fa-plus"></i> Add Owner</button>
+                  </form>
 
-                  let appointmentstable= $('#appointmentstable').DataTable( {
-                    ajax: url+'appointmentInTable/<?php echo $ID;?>',
-		    "order": [],
-                    "columns": [
-                    { "data": "date" },
-                    { "data": "service" },
-                    { "data": "remarks" }
-                    ]
-                  });
-                  $('#appointmentstable tbody').on('click', 'tr', function () {
-                    var data = appointmentstable.row( this ).data();
-                    location.assign('<?php echo get_site_url()?>/appointment-details?id='+data.appointment_id);
-                  } );
+                  <hr>
 
-                  let pet = [...new Set(dogs.map(item => item.name))];
-                  $('#pet_type').on('change',function(){
-                    pet = [...new Set(dogs.map(item => item.name))];
-                    if("<?php echo $pet_type; ?>"=="Dog"){
-                      pet = [];
-                      pet = [...new Set(dogs.map(item => item.name))];
-                    }else{
-                      pet = [];
-                      pet = [...new Set(cats.map(item => item.name))];
-                    }
+                </div><!--/tab-pane-->
+              </div><!--/tab-content-->
 
-                    let ls ='';
-                    pet.forEach(e=>{
-                      ls+=`<option value="${e}">${e}</option>`;
-                    });
-                    $('#pet_breed').html(ls);
-                    $('#pet_breed').trigger("chosen:updated");
-                  });
-                  let ls ='';
-                  pet.forEach(e=>{
-                    if(e == "<?php echo $pet_breed; ?>"){
-                      ls+=`<option value="${e}" selected>${e}</option>`;
-                    }else{
-                      ls+=`<option value="${e}">${e}</option>`;
-                    }
+            </div><!--/col-9-->
+          </div><!--/row-->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php include "page-footer.php"; ?>
+  <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/dog-breed.js"></script>
+  <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/cat-breed.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script>
+    let image_data ='';
+    let id = <?php echo $_GET['id']; ?>;
+    pets = [];
+    $(document).ready(function(){
+      let pastmedicaltable = $('#past-medical-services').DataTable({
+        ajax: url+'past/medical/<?php echo $ID;?>/0',
+        "order": [[ 0, "desc" ]],
+        "columns": [
+        { "data": "col1" },
+        { "data": "col2" }
+        ],
+        dom: 'Bfrtip',
+        buttons: [
+        {
+          text: 'Print Past Medical Services',
+          className: 'btn btn-primary',
+          action: function ( e, dt, node, config ) {
+            printData();
+          }
+        }
+        ]
+      });
+      let appointmentstable= $('#appointmentstable').DataTable( {
+        ajax: url+'appointmentInTable/<?php echo $ID;?>',
+        "order": [[ 3, "desc" ]],
+        "columns": [
+        { "data": "date" },
+        { "data": "service" },
+        { "data": "remarks" },
+        { "data": "date_created" }
+        ]
+      });
+      $('#appointmentstable tbody').on('click', 'tr', function () {
+        var data = appointmentstable.row( this ).data();
+        location.assign('<?php echo get_site_url()?>/appointment-details?id='+data.appointment_id);
+      } );
 
-                  });
-                  $('#pet_breed').html(ls);
-                  $('#pet_breed').chosen({ width:'100%' });
-                  
+      let pet = [...new Set(dogs.map(item => item.name))];
+      $('#pet_type').on('change',function(){
+        pet = [...new Set(dogs.map(item => item.name))];
+        if("<?php echo $pet_type; ?>"=="Dog"){
+          pet = [];
+          pet = [...new Set(dogs.map(item => item.name))];
+        }else{
+          pet = [];
+          pet = [...new Set(cats.map(item => item.name))];
+        }
+
+        let ls ='';
+        pet.forEach(e=>{
+          ls+=`<option value="${e}">${e}</option>`;
+        });
+        $('#pet_breed').html(ls);
+        $('#pet_breed').trigger("chosen:updated");
+      });
+      let ls ='';
+      pet.forEach(e=>{
+        if(e == "<?php echo $pet_breed; ?>"){
+          ls+=`<option value="${e}" selected>${e}</option>`;
+        }else{
+          ls+=`<option value="${e}">${e}</option>`;
+        }
+
+      });
+      $('#pet_breed').html(ls);
+      $('#pet_breed').chosen({ width:'100%' });
+
       // $('#dataTable tbody').on( 'mouseenter', 'td', function () {
       //  var colIdx = table.cell(this).index().column;
 
@@ -705,15 +580,21 @@ foreach ($past_med as $key ) {
             }
           });
           return false;
-      });
+        });
 
       })
-
-                function getmypetdetails(id){
-                  fetch(url+'mypetsdetails/'+id).then(res=>res.json()).then(res=>{
-                       if(res[0].pet_image == ""){
-                        res[0].pet_image = "<?php echo get_site_url();?>/wp-content/uploads/2020/03/vet-app-icon-removebg-preview-1.png";
-                      }
+function printData(){
+   var divToPrint=document.getElementById("past-medical-services");
+   newWin= window.open("");
+   newWin.document.write(divToPrint.outerHTML);
+   newWin.print();
+   newWin.close();
+}
+function getmypetdetails(id){
+  fetch(url+'mypetsdetails/'+id).then(res=>res.json()).then(res=>{
+   if(res[0].pet_image == ""){
+    res[0].pet_image = "<?php echo get_site_url();?>/wp-content/uploads/2020/03/vet-app-icon-removebg-preview-1.png";
+  }
         // console.log(res);
         $('#petname').html("Pet Name: "+res[0].pet_name);
         $('#pet_name_add').val(res[0].pet_name);
@@ -739,36 +620,36 @@ foreach ($past_med as $key ) {
         });
         // console.log(pet);
       });
-                }
-                function displayStaff(){
-                  let ls="";
-                  let data = {
-                    clinic_id : <?php echo $myclinic_id;?>
-                    }
-                  fetch(url+"employees",{
-                        method: 'POST',
-                        body : JSON.stringify(data)
-                    }).then(res=>res.json()).then(res=>{
-                    res.forEach(x=>{
-                      ls+=`<option value="${x.ID}">${x.name} (${x.role}) </option>`
-                    });
+}
+function displayStaff(){
+  let ls="";
+  let data = {
+    clinic_id : <?php echo $myclinic_id;?>
+  }
+  fetch(url+"employees",{
+    method: 'POST',
+    body : JSON.stringify(data)
+  }).then(res=>res.json()).then(res=>{
+    res.forEach(x=>{
+      ls+=`<option value="${x.ID}">${x.name} (${x.role}) </option>`
+    });
 
-                    $('#staffs').html(ls);
-                    $('#up_staffs').html(ls);
-                  });
+    $('#staffs').html(ls);
+    $('#up_staffs').html(ls);
+  });
 
-                }
-                function addowner(){
-                  let newownerdetails = {};
-                  $('#newownerdetails').serializeArray().forEach(x=>{
-                    newownerdetails[x.name] = x.value;
-                  });
-                  newownerdetails['role'] = "Sub-Owner";
-                  console.log(newownerdetails)
-                  fetch(url+'owners',{
-                    method:"POST",
-                    body: JSON.stringify(newownerdetails)
-                  }).then(res=>res.json()).then(res=>{
+}
+function addowner(){
+  let newownerdetails = {};
+  $('#newownerdetails').serializeArray().forEach(x=>{
+    newownerdetails[x.name] = x.value;
+  });
+  newownerdetails['role'] = "Sub-Owner";
+  console.log(newownerdetails)
+  fetch(url+'owners',{
+    method:"POST",
+    body: JSON.stringify(newownerdetails)
+  }).then(res=>res.json()).then(res=>{
         // console.log(res);
         if(res.d=="Success"){
           Swal.fire({
@@ -781,15 +662,15 @@ foreach ($past_med as $key ) {
           location.assign("<?php echo get_site_url();?>/owners-details?id="+res.id);
         }
       });
-                }
-                function updateMypets(){
+}
+function updateMypets(){
 
-                  let mypetdetails = {};
-                  $('#mypetdetails').serializeArray().forEach(x=>{
-                    mypetdetails[x.name] = x.value;
-                  });
-                  mypetdetails['up_pet_id'] = id;
-                  mypetdetails['up_pet_image'] = image_data;
+  let mypetdetails = {};
+  $('#mypetdetails').serializeArray().forEach(x=>{
+    mypetdetails[x.name] = x.value;
+  });
+  mypetdetails['up_pet_id'] = id;
+  mypetdetails['up_pet_image'] = image_data;
     // console.log(mydetails);
 
     $.ajax({
@@ -811,27 +692,27 @@ foreach ($past_med as $key ) {
         
       }
     });
-}
-let gotoPetPage = (id) =>{
-  location.assign('<?php echo get_site_url();?>/appointment-details?id='+id);
-}
-function editPicture(){
-  Webcam.set({
-    width: 265,
-    height: 240,
-    image_format: 'jpeg',
-    jpeg_quality: 100,
-    force_flash:false,
-    flip_horiz:false,
-    fps:45
-  });
-  Webcam.attach( '#my_camera' );
-  $('#takesnap').prop('hidden',false);
-  $('#retake').prop('hidden',true);
-  $('#takephoto').prop('hidden',true);
-}
-function take_snapshot(){
-  Webcam.snap( function(data_uri) {
+  }
+  let gotoPetPage = (id) =>{
+    location.assign('<?php echo get_site_url();?>/appointment-details?id='+id);
+  }
+  function editPicture(){
+    Webcam.set({
+      width: 265,
+      height: 240,
+      image_format: 'jpeg',
+      jpeg_quality: 100,
+      force_flash:false,
+      flip_horiz:false,
+      fps:45
+    });
+    Webcam.attach( '#my_camera' );
+    $('#takesnap').prop('hidden',false);
+    $('#retake').prop('hidden',true);
+    $('#takephoto').prop('hidden',true);
+  }
+  function take_snapshot(){
+    Webcam.snap( function(data_uri) {
     // display results in page
     Webcam.freeze();
     Webcam.reset();
@@ -843,20 +724,20 @@ function take_snapshot(){
     $('#takesnap').prop('hidden',true);
     $('#retake').prop('hidden',false);
     $('#takephoto').prop('hidden',true);
-}
-function capture_again(){
-  Webcam.set({
-    width: 265,
-    height: 240,
-    image_format: 'jpeg',
-    jpeg_quality: 100,
-    force_flash:false,
-    flip_horiz:false,
-    fps:45
-  });
-  Webcam.attach( '#my_camera' );
-  $('#takesnap').prop('hidden',false);
-  $('#retake').prop('hidden',true);
+  }
+  function capture_again(){
+    Webcam.set({
+      width: 265,
+      height: 240,
+      image_format: 'jpeg',
+      jpeg_quality: 100,
+      force_flash:false,
+      flip_horiz:false,
+      fps:45
+    });
+    Webcam.attach( '#my_camera' );
+    $('#takesnap').prop('hidden',false);
+    $('#retake').prop('hidden',true);
 
-}
+  }
 </script>

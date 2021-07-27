@@ -4,7 +4,7 @@ $user = get_userdata( get_current_user_id());
 
     // Get all the user roles as an array.
 $user_roles = $user->roles;
-$clinic_emails='';
+
 if(!empty($user_roles)){
 	if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
 		$clinic_id = get_user_meta(get_current_user_id(),'clinic_id',true);
@@ -16,23 +16,23 @@ if(!empty($user_roles)){
 	}
 }
 $validity = checkValidity($clinic_emails); 
-$username_sms = get_post_meta( '130', 'username_sms', true );
-$password_sms = get_post_meta( '130', 'password_sms', true );
-// var_dump($username_sms);
+$username_sms = get_post_meta( $clinic_id, 'username_sms', true );
+$password_sms = get_post_meta( $clinic_id, 'password_sms', true );
+
 ?>
 
-<footer class="py-4 bg-light mt-auto">
-	<div class="container-fluid">
-		<div class="d-flex align-items-center justify-content-between small">
-			<div class="text-muted">Copyright &copy; Endsofttech Web Solutions 2020</div>
-			<div>
-				<a href="#">Privacy Policy</a>
-				&middot;
-				<a href="#">Terms &amp; Conditions</a>
-			</div>
-		</div>
-	</div>
-</footer>
+<!--<footer class="py-4 bg-light mt-auto">-->
+<!--	<div class="container-fluid">-->
+<!--		<div class="d-flex align-items-center justify-content-between small">-->
+<!--			<div class="text-muted">Copyright &copy; Endsofttech Web Solutions 2020</div>-->
+<!--			<div>-->
+<!--				<a href="#">Privacy Policy</a>-->
+<!--				&middot;-->
+<!--				<a href="#">Terms &amp; Conditions</a>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--	</div>-->
+<!--</footer>-->
 </div>
 </div>
 <!-- Search Form -->
@@ -113,16 +113,17 @@ $password_sms = get_post_meta( '130', 'password_sms', true );
 	$(document).ready(function(){
 		$.ajax({
 			url: url+"sms/balance",
-			data:JSON.stringify({name:"<?php echo $username_sms?>",password:"<?php echo $password_sms?>"}),
+			data:JSON.stringify({name:"<?php echo $username_sms;?>",password:"<?php echo $password_sms;?>"}),
 			type: 'POST',
 			dataType: 'json',
 			success: function(response) {
-				if(response.balance == '-1001 = AUTHENTICATION FAILED' || response.balance == '-1008 = MISSING PARAMETER'){
-					$('#smsbal').html(0);
-				}else{
-					$('#smsbal').html(response.balance);
-				}
-				
+			      let balance = 0;
+          if(response.balance == '-1001 = AUTHENTICATION FAILED' || response.balance == '-1008 = MISSING PARAMETER'){
+              balance = 0;
+          }else{
+              balance = response.balance;
+          }
+        $('#smsbal').html(balance);
 			}
 		});
 
@@ -168,7 +169,7 @@ $password_sms = get_post_meta( '130', 'password_sms', true );
 			correlativeTemplate: true,
 			source: {
 				teams: {
-					url: url+"search"
+					url: url+"search/<?php echo $clinic_id; ?>"
 				}
 			},
 			callback: {
@@ -271,14 +272,16 @@ if(count($validity) == 0 && $user_roles[0] !== 'administrator' ){ ?>
 	<script>
 
 		var ifConnected = window.navigator.onLine;
-		let urlnew = 'https://vaxilifecorp.com/wp-json/vet/v1/';
+		let urlnew = '<?php echo get_site_url();?>/wp-json/vet/v1/';
 		if (ifConnected) {
 			Swal.fire({
 				title: 'Serial Key Not Found!',
 				text: "Please Contact Administrator for your serial key",
-				html: `Please Enter Serial Key <br> Please Contact Website to get Access Key <a href="#">here.</a>
-				<input type="text" id="email" class="swal2-input" placeholder="Enter your Registered Email"></input>
-				<input type="text" id="serialkey" class="swal2-input" placeholder="Enter Serial Key"></input>`,
+				html: 'Please Enter Serial Key <br> Please Contact Website to get Access Key <a href="#">here.</a>',
+				input: 'text',
+				inputAttributes: {
+					required: true
+				},
 				icon: 'warning',
 				allowOutsideClick: false,
 				showCancelButton: false,
@@ -286,14 +289,11 @@ if(count($validity) == 0 && $user_roles[0] !== 'administrator' ){ ?>
 				cancelButtonColor: '#d33',
 				confirmButtonText: 'Submit',
 				showLoaderOnConfirm: true,
-				preConfirm: () => {
-					 let email = Swal.getPopup().querySelector('#email').value;
-					 let serialkey = Swal.getPopup().querySelector('#serialkey').value
+				preConfirm: (serialkey) => {
 					let data = {
 						serial_number : serialkey,
-						customer_email: email
+						customer_email: "<?php echo $clinic_email; ?>"
 					}
-
 					return fetch(urlnew+'serialverify',{
 						method:"POST",
 						body:JSON.stringify(data)
@@ -345,7 +345,7 @@ if(count($validity) == 0 && $user_roles[0] !== 'administrator' ){ ?>
 					}).then((result) => {
 						/* Read more about handling dismissals below */
 						if (result.dismiss === Swal.DismissReason.timer) {
-							console.log('I was closed by the timer')
+				// 			console.log('I was closed by the timer')
 
 						}
 					})

@@ -2663,5 +2663,43 @@ let cats = [
     "short_legs": 0,
     "wikipedia_url": "https://en.wikipedia.org/wiki/York_Chocolate",
     "hypoallergenic": 0
+  },
+  {
+    "weight": {
+      "imperial": "12 - 18",
+      "metric": "5 - 8"
+    },
+    "id": "gecko",
+    "name": "Mix Breed",
+    "temperament": "Playful, Social, Intelligent, Curious, Friendly",
+    "origin": "United States",
+    "country_codes": "US",
+    "country_code": "US",
+    "description": "York Chocolate cats are known to be true lap cats with a sweet temperament. They love to be cuddled and petted. Their curious nature makes them follow you all the time and participate in almost everything you do, even if it's related to water: unlike many other cats, York Chocolates love it.",
+    "life_span": "13 - 15",
+    "indoor": 0,
+    "lap": 1,
+    "alt_names": "York",
+    "adaptability": 5,
+    "affection_level": 5,
+    "child_friendly": 4,
+    "dog_friendly": 5,
+    "energy_level": 5,
+    "grooming": 3,
+    "health_issues": 1,
+    "intelligence": 5,
+    "shedding_level": 3,
+    "social_needs": 4,
+    "stranger_friendly": 4,
+    "vocalisation": 5,
+    "experimental": 0,
+    "hairless": 0,
+    "natural": 0,
+    "rare": 0,
+    "rex": 0,
+    "suppressed_tail": 0,
+    "short_legs": 0,
+    "wikipedia_url": "https://en.wikipedia.org/wiki/York_Chocolate",
+    "hypoallergenic": 0
   }
 ]

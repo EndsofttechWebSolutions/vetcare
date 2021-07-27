@@ -90,7 +90,7 @@ foreach ($sms_info as $key ) {
   $message = $key->message;
 }
 
-$clinicinfo = getDetails(array(1,'clinic_id','vet_clinic'));
+$clinicinfo = getDetails(array($myclinic_id,'clinic_id','vet_clinic'));
 foreach ($clinicinfo as $key ) {
   $mobile_number = $key->mobile_number;
   $landline = $key->landline;
@@ -119,170 +119,179 @@ $coupons = getDetails(array($myclinic_id,'clinic_id','vet_coupon'));
 
 $bg = '';
 if($remarks == 'Upcoming'){
-    $bg = 'style="background:yellow;"';
+  $bg = 'style="background:yellow;"';
 }else if($remarks == 'Absent'){
-    $bg = 'style="background:red;color:white"';
+  $bg = 'style="background:red;color:white"';
 }else{
-     $bg = 'style="background:green;color:white"';
+ $bg = 'style="background:green;color:white"';
 }
 ?>
 <style>
-  .files:before {
-    position: absolute;
-    bottom: 10px;
-    left: 0;  pointer-events: none;
-    width: 100%;
-    right: 0;
-    height: 60px;
+.files:before {
+  position: absolute;
+  bottom: 10px;
+  left: 0;  pointer-events: none;
+  width: 100%;
+  right: 0;
+  height: 60px;
 
-    display: block;
-    margin: 0 auto;
-    color: #2ea591;
-    font-weight: 600;
-    text-transform: capitalize;
-    text-align: center;
+  display: block;
+  margin: 0 auto;
+  color: #2ea591;
+  font-weight: 600;
+  text-transform: capitalize;
+  text-align: center;
+}
+textarea#mycontent {
+  padding-top:10px;
+  padding-bottom:25px; /* increased! */
+  width:100%; /* changed from 96 to 100% */
+  display:block;
+}
+.dropzone {
+  background: white;
+  border-radius: 5px;
+  border: 2px dashed rgb(0, 135, 247);
+  border-image: none;
+  max-width: inherit;
+  margin-left: auto;
+  margin-right: auto;
+}
+/*Next Schedule*/
+input#scheduledate {
+  margin-top: 7px!important;
+}
+button#delete_eachAppointment {
+  margin-top: 10px!important;
+}
+/*Date*/
+.bootstrap-timepicker-widget table td input {
+  width: 32px!important;
+  margin: 0;
+  text-align: center;
+}
+/*Attachments*/
+/*button#savesnapshot {*/
+  /*  margin-left: 420px!Important;*/
+  /*  position: absolute;*/
+  /*}*/
+  ul.list-group li:nth-child(odd) {
+    background: #eee; 
+    /*color:white;*/
   }
-  textarea#mycontent {
-    padding-top:10px;
-    padding-bottom:25px; /* increased! */
-    width:100%; /* changed from 96 to 100% */
-    display:block;
+  .list-group{
+    overflow-x: hidden;
   }
-  .dropzone {
-    background: white;
-    border-radius: 5px;
-    border: 2px dashed rgb(0, 135, 247);
-    border-image: none;
-    max-width: inherit;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  /*Next Schedule*/
-  input#scheduledate {
-    margin-top: 7px!important;
-  }
-  button#delete_eachAppointment {
-    margin-top: 10px!important;
-  }
-  /*Date*/
-  .bootstrap-timepicker-widget table td input {
-    width: 32px!important;
-    margin: 0;
-    text-align: center;
-  }
-  /*Attachments*/
-  /*button#savesnapshot {*/
-    /*  margin-left: 420px!Important;*/
-    /*  position: absolute;*/
-    /*}*/
-    ul.list-group li:nth-child(odd) {
-      background: #eee; 
-      /*color:white;*/
+  @media only screen and (max-width: 768px) {
+    #signature-pad{
+      width: 550px;
+      margin-left: 16px;
+      margin-top: 5px;
     }
-    .list-group{
-      overflow-x: hidden;
+  }
+  @media only screen and (max-width: 1024px) {
+    #signature-pad{
+      margin-top: 5px;
+      margin-left: 46px;
     }
-    @media only screen and (max-width: 768px) {
-      #signature-pad{
-        width: 550px;
-        margin-left: 16px;
-        margin-top: 5px;
-      }
-    }
-    @media only screen and (max-width: 1024px) {
-      #signature-pad{
-        margin-top: 5px;
-        margin-left: 46px;
-      }
-    }
+  }
 
-    @media only screen and (max-width: 1920px) {
-      #signature-pad{
-        width: 80%;
-        margin-left: 120px;
-        margin-top: 5px;
-      }
+  @media only screen and (max-width: 1920px) {
+    #signature-pad{
+      width: 80%;
+      margin-left: 120px;
+      margin-top: 5px;
     }
-    ul.typeahead__list {
-        background: #F2F6FC;
-    }
+  }
+  ul.typeahead__list {
+    background: #F2F6FC;
+  }
+  button.dt-button {
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    background: blue;
+    color: white;
+  }
 
 
-  </style>
+</style>
 
-  <div id="layoutSidenav_content">
-    <main>
-      <div class="container-fluid">
+<div id="layoutSidenav_content">
+  <main>
+    <div class="container-fluid">
 
-        <h3 class="mt-4">Appoinments</h3>
-        <ol class="breadcrumb mb-4">
-          <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/dashboard">Dashboard</a></li>
-          <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/owners-details/?id=<?php echo $owner_id; ?>"><?php echo $owner_name; ?></a></li>
-          <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/pet-details/?id=<?php echo $pet_id; ?>"><?php echo $pet_name; ?></a></li>
-          <li class="breadcrumb-item active">Appointment Details</li>
-        </ol>
-        <div class="card">
-          <div class="card-header">
-            <h5><?php echo $service_name; ?> | <?php echo date('l jS \of F Y',strtotime($start));?> @ <?php echo $time;?></h5>
-            <small>Click on each tab to input findings, upload attachments and schedule next appointment</small>
-            <button class="btn btn-outline-info float-right ml-1 mb-2" name="submitappointment" id="quick_view_med">Quick View of Past Medical Services</button>
-            <div class="col-md-3 mt-3">
-              <div class="input-group" id="remarksdiv">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Status</label>
-                </div>
-                <select class="custom-select" id="remarks" <?php echo $bg;?> >
-                  <option selected disabled> Choose...</option>
-                  <option value="Upcoming" <?php echo ($remarks == "Upcoming" ) ? 'selected':''; ?>>Upcoming</option>
-                  <option value="Absent" <?php echo ($remarks == "Absent" ) ? 'selected':''; ?>>Absent</option>
-                  <option value="Completed" <?php echo ($remarks == "Completed" ) ? 'selected':''; ?>>Completed</option>
-                </select>
+      <h3 class="mt-4">Appoinments</h3>
+      <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/owners-details/?id=<?php echo $owner_id; ?>"><?php echo $owner_name; ?></a></li>
+        <li class="breadcrumb-item "><a href="<?php echo get_home_url()?>/pet-details/?id=<?php echo $pet_id; ?>"><?php echo $pet_name; ?></a></li>
+        <li class="breadcrumb-item active">Appointment Details</li>
+      </ol>
+      <div class="card">
+        <div class="card-header">
+          <h5><?php echo $service_name; ?> | <?php echo date('l jS \of F Y',strtotime($start));?> @ <?php echo $time;?></h5>
+          <small>Click on each tab to input findings, upload attachments and schedule next appointment</small>
+          <button class="btn btn-outline-info float-right ml-1 mb-2" name="submitappointment" id="quick_view_med">Quick View of Past Medical Services</button>
+          <div class="col-md-3 mt-3">
+            <div class="input-group" id="remarksdiv">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Status</label>
               </div>
+              <select class="custom-select" id="remarks" <?php echo $bg;?> >
+                <option selected disabled> Choose...</option>
+                <option value="Upcoming" <?php echo ($remarks == "Upcoming" ) ? 'selected':''; ?>>Upcoming</option>
+                <option value="Absent" <?php echo ($remarks == "Absent" ) ? 'selected':''; ?>>Absent</option>
+                <option value="Completed" <?php echo ($remarks == "Completed" ) ? 'selected':''; ?>>Completed</option>
+              </select>
             </div>
-
           </div>
-          <div class="card-body">
 
-            <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-              <li class="nav-item" hidden>
-                <a class="nav-link " id="pet-tab" data-toggle="tab" href="#petinfo" role="tab" aria-controls="petinfo" aria-selected="false"><i class="fa fa-paw"></i> Pet Info</a>
-              </li>
-              <?php if($service_name!="Vaccination" && $service_name!="De-Worming" && $service_name!="Grooming"){?>
-                <li class="nav-item">
-                  <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true"><i class="fa fa-id-card"></i> General </a>
-                </li>
-              <?php }?>
-              <?php if($service_name!="Grooming"){?>
-                <li class="nav-item">
-                  <a class="nav-link" id="status-tab" data-toggle="tab" href="#status" role="tab" aria-controls="status" aria-selected="false"><i class="fa fa-info"></i> Status</a>
-                </li>
-              <?php }?>
-              <?php if($service_name!="Vaccination" && $service_name!="De-Worming" && $service_name!="Grooming"){?>
-                <li class="nav-item">
-                  <a class="nav-link" id="test-tab" data-toggle="tab" href="#test" role="tab" aria-controls="test" aria-selected="false"><i class="fa fa-vials"></i> Test</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="diag-tab" data-toggle="tab" href="#diag" role="tab" aria-controls="diag" aria-selected="false"><i class="fa fa-file-medical-alt"></i> Diagnostics</a>
-                </li>
-              <?php } ?>
+        </div>
+        <div class="card-body">
 
+          <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" hidden>
+              <a class="nav-link " id="pet-tab" data-toggle="tab" href="#petinfo" role="tab" aria-controls="petinfo" aria-selected="false"><i class="fa fa-paw"></i> Pet Info</a>
+            </li>
+            <?php if($service_name!="Vaccination" && $service_name!="De-Worming" && $service_name!="Grooming"){?>
               <li class="nav-item">
-                <a class="nav-link" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false"><i class="fa fa-paperclip"></i> Attachmments</a>
+                <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true"><i class="fa fa-id-card"></i> General </a>
+              </li>
+            <?php }?>
+            <?php if($service_name!="Grooming"){?>
+              <li class="nav-item">
+                <a class="nav-link" id="status-tab" data-toggle="tab" href="#status" role="tab" aria-controls="status" aria-selected="false"><i class="fa fa-info"></i> Status</a>
+              </li>
+            <?php }?>
+            <?php if($service_name!="Vaccination" && $service_name!="De-Worming" && $service_name!="Grooming"){?>
+              <li class="nav-item">
+                <a class="nav-link" id="test-tab" data-toggle="tab" href="#test" role="tab" aria-controls="test" aria-selected="false"><i class="fa fa-vials"></i> Test</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false"><i class="fa fa-sticky-note-o"></i> Notes</a>
+                <a class="nav-link" id="diag-tab" data-toggle="tab" href="#diag" role="tab" aria-controls="diag" aria-selected="false"><i class="fa fa-file-medical-alt"></i> Diagnostics</a>
               </li>
+            <?php } ?>
+
+            <li class="nav-item">
+              <a class="nav-link" id="attach-tab" data-toggle="tab" href="#attach" role="tab" aria-controls="attach" aria-selected="false"><i class="fa fa-paperclip"></i> Attachmments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false"><i class="fa fa-sticky-note-o"></i> Notes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="next-tab" data-toggle="tab" href="#next" role="tab" aria-controls="next" aria-selected="false"><i class="fa fa-clock"></i> Next Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="sms-tab" data-toggle="tab" href="#sms" role="tab" aria-controls="sms" aria-selected="false"><i class="fa fa-sms"></i> SMS Reminder</a>
+            </li>
+            <?php //if(get_site_url() == 'https://vaxilifecorp.com'){ ?>
               <li class="nav-item">
-                <a class="nav-link" id="next-tab" data-toggle="tab" href="#next" role="tab" aria-controls="next" aria-selected="false"><i class="fa fa-clock"></i> Next Schedule</a>
+                <a class="nav-link" id="invoice-tab" data-toggle="tab" href="#invoice" role="tab" aria-controls="sms" aria-selected="false"><i class="fa fa-file-invoice"></i> Invoice</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" id="sms-tab" data-toggle="tab" href="#sms" role="tab" aria-controls="sms" aria-selected="false"><i class="fa fa-sms"></i> SMS Reminder</a>
-              </li>
-              <?php if(get_site_url() == 'https://vaxilifecorp.com'){ ?>
-                <li class="nav-item">
-                  <a class="nav-link" id="invoice-tab" data-toggle="tab" href="#invoice" role="tab" aria-controls="sms" aria-selected="false"><i class="fa fa-file-invoice"></i> Invoice</a>
-                </li>
-              <?php } ?>
+              <?php //} ?>
 
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -737,30 +746,30 @@ if($remarks == 'Upcoming'){
 
                     <div class="row mt-3">
                       <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
-                    <!--   <div class="row">-->
-                    <!--    <div class="col-md-6">-->
-                    <!--     <div class="input-group mb-2">-->
-                    <!--      <div class="input-group-prepend">-->
-                    <!--        <div class="input-group-text">&#8369;</div>-->
-                    <!--      </div>-->
-                    <!--      <input type="number" class="form-control" id="paymentvalue">-->
-                    <!--      <div class="input-group-prepend">-->
-                    <!--        <button class="btn btn-primary"  id="payment"> Pay</button>-->
-                    <!--      </div>-->
-                    <!--    </div>-->
-                    <!--  </div>-->
-                    <!--  <div class="col-md-6">-->
-                    <!--    <div class="input-group mb-2">-->
-                    <!--      <div class="input-group-prepend">-->
-                    <!--        <div class="input-group-text">Have a Coupon?</div>-->
-                    <!--      </div>-->
-                    <!--      <input type="text" class="form-control" id="couponcode">-->
-                    <!--      <div class="input-group-prepend">-->
-                    <!--        <button class="btn btn-primary" id="couponsubmit"> Submit</button>-->
-                    <!--      </div>-->
-                    <!--    </div>-->
-                    <!--  </div>-->
-                    <!--</div>-->
+                       <div class="row">
+                        <div class="col-md-6">
+                         <div class="input-group mb-2">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">&#8369;</div>
+                          </div>
+                          <input type="number" class="form-control" id="paymentvalue">
+                          <div class="input-group-prepend">
+                            <button class="btn btn-primary"  id="payment"> Pay</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="input-group mb-2">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">Have a Coupon?</div>
+                          </div>
+                          <input type="text" class="form-control" id="couponcode">
+                          <div class="input-group-prepend">
+                            <button class="btn btn-primary" id="couponsubmit"> Submit</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="row">
                       <table class="table table-hover">
                         <thead>
@@ -811,67 +820,74 @@ if($remarks == 'Upcoming'){
                           </tr>
                         </tbody>
                       </table>
-                      <!--<table class="table table-hover">-->
-                      <!--  <tbody id="deductions">-->
+                      <table class="table table-hover">
+                        <tbody id="deductions">
 
-                      <!--  </tbody>-->
-                      <!--</table>-->
-                      <!--<table class="table table-hover">-->
-                      <!--  <tbody>  -->
-                      <!--    <tr>-->
-                      <!--      <td></td>-->
-                      <!--      <td></td>-->
-                      <!--      <td class="text-right"><h4><strong>Balance:</strong></h4></td>-->
-                      <!--      <td class="text-center text-danger" id="balancehtml"><h1><strong>&#8369;0.00</strong></h1></td>-->
-                      <!--    </tr>-->
-                      <!--  </tbody>-->
-                      <!--</table>-->
+                        </tbody>
+                      </table>
+                      <table class="table table-hover">
+                       <tbody> 
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td class="text-right"><h4><strong>Balance:</strong></h4></td>
+                          <td class="text-center text-danger" id="balancehtml"><h1><strong>&#8369;0.00</strong></h1></td>
+                        </tr>
+                      </tbody>
+                    </table>
 
-                    </div>
                   </div>
-                  <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
-                   <div class="row">
-                    <div class="col-md-12">
-                      <div class="table-responsive">
-                        <table class="table table-striped" id="transaction_table" width="100%" cellspacing="0">
-                          <thead>
-                            <tr>
-                              <th>Date / Time</th>
-                              <th>Amount</th>
-                              <th>Balance</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-
-                          </tbody>
-                        </table>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-12">
-                          <button type="button" class="btn btn-success btn-lg btn-block"  id="createinvoicebtn">
-                            <i class="fa fa-file-invoice"></i> Create Invoice
-                          </button>
-                        </div>
-
-                      </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <button type="button" class="btn btn-success btn-lg btn-block"  id="createinvoicebtn">
+                        <i class="fa fa-file-invoice"></i> Create Invoice
+                      </button>
+                    </div>
+                    <div class="col-md-6">
+                      <button type="button" class="btn btn-success btn-lg btn-block"  onclick="savetransaction()">
+                        <i class="fa fa-file-invoice"></i> Save Transaction
+                      </button>
                     </div>
                   </div>
                 </div>
+                <div class="well col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3">
+                 <div class="row">
+                  <div class="col-md-12">
+                    <div class="table-responsive">
+                      <table class="table table-striped" id="transaction_table" width="100%" cellspacing="0">
+                        <thead>
+                          <tr>
+                            <th>Date / Time</th>
+                            <th>Amount</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
 
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
               </div>
 
             </div>
 
           </div>
-        </div>
-        <button class="btn btn-danger ml-1" type="button" name="delete_eachAppointment" id="delete_eachAppointment">Delete Appointment</button>
-        <!-- <button class="btn btn-secondary ml-1" type="button" name="cancelappointment" id="cancelappointment">Cancel</button> -->
-        <button class="btn btn-success ml-1 mt-2" type="button" name="saveclose" id="saveclose">Save & Close</button>
-        <button class="btn btn-primary float-right ml-1 mr-2 mt-2" type="button" name="saveclose" onclick="savedata()">Save Changes</button>
 
+        </div>
       </div>
+      <button class="btn btn-danger ml-1" type="button" name="delete_eachAppointment" id="delete_eachAppointment">Delete Appointment</button>
+      <!-- <button class="btn btn-secondary ml-1" type="button" name="cancelappointment" id="cancelappointment">Cancel</button> -->
+      <button class="btn btn-success ml-1 mt-2" type="button" name="saveclose" id="saveclose">Save & Close</button>
+      <button class="btn btn-primary float-right ml-1 mr-2 mt-2" type="button" name="saveclose" onclick="savedata()">Save Changes</button>
+
     </div>
   </div>
+</div>
 </div>
 </main>
 
@@ -885,389 +901,344 @@ if($remarks == 'Upcoming'){
         </button>
       </div>
       <div class="modal-body">
-        <ul class="list-group">
-          <?php
-          global $wpdb;
-          $past_med = $wpdb->get_results("SELECT * FROM {$table} where pet_id = {$pet_id} AND appointment_id != {$ID} AND service_name != 'Grooming'  order by appointment_id DESC ");
-          $arrayData = array();
-          foreach ($past_med as $key ) {
-            $appointment_id = $key->appointment_id;
-            if($key->service_name == "Board"){
-              $key->service_name = "Board & Lodging";
-            }
-            ?>
-            <li class="list-group-item " style="margin: 10px;">
-              <h1 style="font-weight: bold"><a href="<?php echo get_site_url()?>/appointment-details?id=<?php echo $appointment_id; ?>" style="text-decoration: none;color:black;font-size: 35px;"><?php echo $key->service_name;?></a></h1>
-              <small class="mb-5" style="color:red;"><?php echo date('l jS \of F Y',strtotime($key->start_date));?></small>
-              <div class="row">
-                <div class="col-md-8">
+        <div class="table-responsive">
+          <table class="table table-striped" id="past-medical-services" width="100%" cellspacing="0" style="cursor:pointer">
+            <thead>
+              <tr>
+                <th>Service Name</th>
+                <th>Notes & Attachments</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-                  <?php
-                  global $wpdb;
-                  $generaltable=$wpdb->prefix.'vet_pet_general';
-                  $generallist = $wpdb->get_results("SELECT * FROM {$generaltable} WHERE appointment_id = ".$appointment_id." ");
-                  $arrayData = array();
-                  $show = true; 
-                  ?>
+<div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Upload Waiver</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <select class="form-control" id="waiver_title">
+              <option selected disabled>Select Waiver Type</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+          <div class="form-group" id="waiver_content">
 
-                  <?php foreach ($generallist as $skey ) {
-                    if($skey->temperature !== ""){
-                      $show = true;
-                    }else{
-                      $show = false;
-                    }
-                  } 
-                  if($show == true){
-                    ?>
-
-                    <h4 style="font-weight: bold;color:red">General</h5>
-
-                      <?php
-                      foreach ($generallist as $skey ) {
-                        if($skey->temperature !== ""){
-                        ?>
-                        <p class="mb-1" >Temperature : <?php echo $skey->temperature; ?> </p>
-                        <p class="mb-1" >Weight : <?php echo $skey->weight; ?> </p>
-                      <?php }
-                      }
-                    } ?>
-
-
-                    <?php
-                    global $wpdb;
-                    $testtable=$wpdb->prefix.'vet_pet_test';
-                    $testlist = $wpdb->get_results("SELECT * FROM {$testtable} WHERE appointment_id = ".$appointment_id." group by meta_key");
-                    $arrayData = array();
-                    ?>
-                    <?php if(count($testlist) > 0){ ?>
-                      <hr>
-                      <h4 style="font-weight: bold;color:red">Test</h5>
-                      <?php } ?>
-                      <?php
-                      foreach ($testlist as $skey ) {
-                        ?>
-                        <p class="mb-1" ><?php echo $skey->meta_key; ?> : <?php echo $skey->meta_value; ?> </p>
-                      <?php } ?>
-
-
-                      <?php
-                      global $wpdb;
-                      $statustable=$wpdb->prefix.'vet_pet_status';
-                      $statuslist = $wpdb->get_results("SELECT * FROM {$statustable} WHERE appointment_id = ".$appointment_id." group by meta_key");
-                      $arrayData = array();
-                      ?>
-                      <?php if(count($statuslist) > 0){ ?>
-                        <hr>
-                        <h4 style="font-weight: bold;color:red">Status</h5>
-                        <?php } ?>
-                        <?php
-                        foreach ($statuslist as $skey ) {
-                          ?>
-                          <p class="mb-1" ><?php echo $skey->meta_key; ?> : <?php echo $skey->meta_value; ?></p>
-                        <?php } ?>
-
-
-                        <?php
-                        global $wpdb;
-                        $statustable=$wpdb->prefix.'vet_pet_diagnostics';
-                        $statuslist = $wpdb->get_results("SELECT * FROM {$statustable} WHERE appointment_id = ".$appointment_id." ");
-                        $arrayData = array();
-                        $show = true;
-                        ?>
-                        <?php 
-                        foreach ($statuslist as $skey ) {
-                          if($skey->procedure_done !== ""){
-                            $show = true;
-                          }else{
-                            $show = false;
-                          }
-                        }
-                        if($show == true){ ?>
-                          <hr>  
-                          <h4 style="font-weight: bold;color:red">Diagnostics</h5>
-
-                            <?php
-                            foreach ($statuslist as $skey ) {
-                              if($skey->procedure_done == ""){
-                                $show = false;
-                              }
-                              ?>
-                              <p class="mb-1">Procedure : <?php echo $skey->procedure_done; ?></p>
-                              <p class="mb-1">Tentative : <?php echo $skey->tentative; ?></p>
-                              <p class="mb-1">Medication : <?php echo $skey->medication; ?></p>
-                              <p class="mb-1">Prescription : <?php echo $skey->prescription; ?></p>
-                            <?php }
-                          } ?>
-                        </div>  
-                        <div class="col-md-4">
-                          <?php if ($key->notes !== "" ): ?>
-                            <h4 style="font-weight: bold;color:red">Notes</h5>
-                              <span><?php echo $key->notes; ?></span>
-                            <?php endif ?>
-
-
-
-                            <?php
-                            global $wpdb;
-                            $attachtb=$wpdb->prefix.'vet_pet_attachments';
-                            $upload_dir = wp_upload_dir();
-                            $results = $wpdb->get_results("SELECT * FROM {$attachtb} WHERE appointment_id = ".$appointment_id." ");
-                            ?>
-                            <?php if(count($results) > 0){ ?>
-                              <hr>
-                              <h4 style="font-weight: bold;color:red">Attachments</h5>
-                              <?php } ?>
-                              <?php
-                              foreach ($results as $skey ) {
-                                $location = $upload_dir['baseurl'] .'/'.  $skey->uploaded_file;
-                                echo "<span><a href=".$location." target='_blank'>".$skey->uploaded_file."</a></span> <br>";
-                              }
-                              ?>
-
-                            </div>  
-                          </div>
-                        </li>
-
-                      <?php } ?>
-
-                    </ul>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
-                </div>
-              </div>
+          </div>
+          <div class="col-md-12">
+            <div class="" style="text-align: center;">
+              Sign the document if you agree<br />
+              <button id="ShowSig" type="button" data-toggle="modal" data-target="#sigModal" class="btn btn-raised btn-primary waves-effect m-l--10 m-r--10">Input your signature</button>
             </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-waiver">Save Waiver</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-            <div class="modal fade" id="largeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Upload Waiver</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <form>
-                      <div class="form-group">
-                        <select class="form-control" id="waiver_title">
-                          <option selected disabled>Select Waiver Type</option>
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                        </select>
-                      </div>
-                      <div class="form-group" id="waiver_content">
-
-                      </div>
-                      <div class="col-md-12">
-                        <div class="" style="text-align: center;">
-                          Sign the document if you agree<br />
-                          <button id="ShowSig" type="button" data-toggle="modal" data-target="#sigModal" class="btn btn-raised btn-primary waves-effect m-l--10 m-r--10">Input your signature</button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="save-waiver">Save Waiver</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="modal fade" id="sigModal" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
-              <div class="modal-dialog modal-lg scroll" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">Input your signature below</div>
-                  <div class="modal-body">
-                    <div class="wrapper-pen align-center" style="background: #eee">
-                      <canvas id="signature-pad" class="signature-pad" width="900" height="500" style="background: white;"></canvas>
-                    </div>
-                  </div>
-                  <div class="modal-body">
-                    <div class="row clearfix">
-                      <div class="col-sm-6">
-                        <button id="btnCloseSIg" type="button" data-dismiss="modal" class="btn btn-raised waves-effect">Close</button>
-                      </div>
-                      <div class="col-sm-6 float-right">
-                        <button id="getSignature" type="button" class="btn btn-raised waves-effect btn-success float-right">Accept Signature</button>
-                        <button id="clearSignature" type="button" class="btn btn-raised waves-effect float-right">Clear</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div class="modal fade" id="sigModal" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-lg scroll" role="document">
+    <div class="modal-content">
+      <div class="modal-header">Input your signature below</div>
+      <div class="modal-body">
+        <div class="wrapper-pen align-center" style="background: #eee">
+          <canvas id="signature-pad" class="signature-pad" width="900" height="500" style="background: white;"></canvas>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="row clearfix">
+          <div class="col-sm-6">
+            <button id="btnCloseSIg" type="button" data-dismiss="modal" class="btn btn-raised waves-effect">Close</button>
+          </div>
+          <div class="col-sm-6 float-right">
+            <button id="getSignature" type="button" class="btn btn-raised waves-effect btn-success float-right">Accept Signature</button>
+            <button id="clearSignature" type="button" class="btn btn-raised waves-effect float-right">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-            <div class="modal fade" id="camfile" tabindex="-1" role="dialog" style="display: none;"  aria-hidden="true">
-              <div class="modal-dialog modal-lg scroll">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Capture File to upload </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="col-md-12">
-                      <div id="mywebcam" style="background: #eee;"></div>
-                    </div>
+<div class="modal fade" id="camfile" tabindex="-1" role="dialog" style="display: none;"  aria-hidden="true">
+  <div class="modal-dialog modal-lg scroll">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Capture File to upload </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div id="mywebcam" style="background: #eee;"></div>
+        </div>
 
-                    <div class="row clearfix">
-                      <div class="col-sm-12 mt-3 " style="text-align: center;">
-                       <button type="button" class="btn btn-raised waves-effect btn-success" id="savesnapshot"><i class="glyphicon glyphicon-camera"></i> Save Snapshot</button>
-                       <button type="button" class="btn btn-raised waves-effect btn-primary" id="takesnapshot"><i class="glyphicon glyphicon-camera"></i> Take a Snapshot</button>
-                       <button type="button" class="btn btn-raised waves-effect btn-danger" id="retake" hidden><i class="glyphicon glyphicon-camera"></i> Capture Again</button>
-                     </div>
+        <div class="row clearfix">
+          <div class="col-sm-12 mt-3 " style="text-align: center;">
+           <button type="button" class="btn btn-raised waves-effect btn-success" id="savesnapshot"><i class="glyphicon glyphicon-camera"></i> Save Snapshot</button>
+           <button type="button" class="btn btn-raised waves-effect btn-primary" id="takesnapshot"><i class="glyphicon glyphicon-camera"></i> Take a Snapshot</button>
+           <button type="button" class="btn btn-raised waves-effect btn-danger" id="retake" hidden><i class="glyphicon glyphicon-camera"></i> Capture Again</button>
+         </div>
 
-                   </div>
+       </div>
 
-                 </div>
-               </div>
-               <!-- /.modal-content -->
-             </div>
-             <!-- /.modal-dialog -->
-           </div>
+     </div>
+   </div>
+   <!-- /.modal-content -->
+ </div>
+ <!-- /.modal-dialog -->
+</div>
 
-           <?php include "page-footer.php"; ?>
-           <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/min/dropzone.js"></script>
-           <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/min/jquery-dropzone.js"></script>
-           <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/initialize-summernote.js"></script>
-           <script>
-            let waiver = [];
-            let filelisttable ='';
-            let existing = [];
-            let contentready = [];
-            let statuscontents = [];
-            let contentreadytest = [];
-            let existingtest = [];
-            let testcontents = [];
-            let allprice = [];
-            let alldeductions = [];
-            document.addEventListener('DOMContentLoaded', function(e) {
+<div class="modal fade" id="paymentform" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Payment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="paymentContent">
+      </div>
+    </div>
+  </div>
+</div>
 
-              $('#notes_content').summernote({
-                placeholder: 'Notes',
-                tabsize: 2,
-                height: 300
-              });
+<?php include "page-footer.php"; ?>
+<script src="<?php echo get_stylesheet_directory_uri(); ?>/js/min/dropzone.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(); ?>/js/min/jquery-dropzone.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(); ?>/js/initialize-summernote.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script>
+  let waiver = [];
+  let filelisttable ='';
+  let existing = [];
+  let contentready = [];
+  let statuscontents = [];
+  let contentreadytest = [];
+  let existingtest = [];
+  let testcontents = [];
+  let allprice = [];
+  let alldeductions = [];
+  document.addEventListener('DOMContentLoaded', function(e) {
+   let pastmedicaltable = $('#past-medical-services').DataTable({
+    ajax: url+'past/medical/<?php echo $pet_id;?>/<?php echo $ID;?>',
+    "order": [[ 0, "desc" ]],
+    "columns": [
+    { "data": "col1" },
+    { "data": "col2" }
+    ],
+    dom: 'Bfrtip',
+    buttons: [
+    {
+      text: 'Print Past Medical Services',
+      className: 'btn btn-primary',
+      action: function ( e, dt, node, config ) {
+        printData();
+      }
+    }
+    ]
+  });
+
+   $('#notes_content').summernote({
+    placeholder: 'Notes',
+    tabsize: 2,
+    height: 300
+  });
 
 
-              $('#openwaiver').click(function(){
-                $('#largeModal').modal('show');
-                $('#waiver_title').trigger('change');
+   $('#openwaiver').click(function(){
+    $('#largeModal').modal('show');
+    $('#waiver_title').trigger('change');
 
-              });
+  });
 
-              getProductlist();
-              fetch(url+'statusfields/<?php echo $ID;?>').then(res=>res.json()).then(res=>{
-                let content = '';
-                console.log(res);
+   getProductlist();
+   fetch(url+'statusfields/<?php echo $ID;?>').then(res=>res.json()).then(res=>{
+    let content = '';
+    console.log(res);
 
 
-                res.forEach(x=>{
-                  contentready.push(x.meta_key);
-                  statuscontents.push(x.meta_key);
-                  if(x.meta_key === null){
+    res.forEach(x=>{
+      contentready.push(x.meta_key);
+      statuscontents.push(x.meta_key);
+      if(x.meta_key === null){
 
-                  }else{
-                    content +=`<div class="col-md-6 mb-3">
-                    <label for="res">${x.meta_key}</label>
-                    <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="res"  name="${x.meta_key}" value="${x.meta_value}" required>
-                    <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon1" onclick="removeMeta('${x.meta_key}')">x</span>
-                    </div>
+      }else{
+        content +=`<div class="col-md-6 mb-3">
+        <label for="res">${x.meta_key}</label>
+        <div class="input-group mb-3">
+        <input type="text" class="form-control" id="res"  name="${x.meta_key}" value="${x.meta_value}" required>
+        <div class="input-group-append">
+        <span class="input-group-text" id="basic-addon1" onclick="removeMeta('${x.meta_key}')">x</span>
+        </div>
 
-                    </div>
-                    </div>`;
-                  }
+        </div>
+        </div>`;
+      }
 
-                });
-                if(contentready.length > 0){
-                  document.querySelector('#status-row').innerHTML = content;
-                }
-                existing = res;
-              });
-              fetch(url+'testfields/<?php echo $ID;?>').then(res=>res.json()).then(res=>{
+    });
+    if(contentready.length > 0){
+      document.querySelector('#status-row').innerHTML = content;
+    }
+    existing = res;
+  });
+   fetch(url+'testfields/<?php echo $ID;?>').then(res=>res.json()).then(res=>{
 
-                let content = '';
+    let content = '';
 
-                res.forEach(x=>{
-                  contentreadytest.push(x.meta_key);
-                  testcontents.push(x.meta_key);
-                  content +=`<div class="col-md-6 mb-3">
-                  <label for="res">${x.meta_key}</label>
-                  <div class="input-group mb-3">
-                  <input type="text" class="form-control" id="res"  name="${x.meta_key}" value="${x.meta_value}" required>
-                  <div class="input-group-append">
-                  <span class="input-group-text" id="basic-addon1" onclick="removeMetaTest('${x.meta_key}')">x</span>
-                  </div>
+    res.forEach(x=>{
+      contentreadytest.push(x.meta_key);
+      testcontents.push(x.meta_key);
+      content +=`<div class="col-md-6 mb-3">
+      <label for="res">${x.meta_key}</label>
+      <div class="input-group mb-3">
+      <input type="text" class="form-control" id="res"  name="${x.meta_key}" value="${x.meta_value}" required>
+      <div class="input-group-append">
+      <span class="input-group-text" id="basic-addon1" onclick="removeMetaTest('${x.meta_key}')">x</span>
+      </div>
 
-                  </div>
-                  </div>`;
-                });
-                if(contentreadytest.length > 0){
-                  document.querySelector('#test-row').innerHTML = content;
-                }
-                existingtest = res;
-              });
-              displayStaff();
+      </div>
+      </div>`;
+    });
+    if(contentreadytest.length > 0){
+      document.querySelector('#test-row').innerHTML = content;
+    }
+    existingtest = res;
+  });
+   displayStaff();
 
-              readyTestFields()
-              readyStatusFields()
-              $('#scheduledate').change(function(){
-                $('#daysnotif').val($('#scheduledate').val());
-              });
-              $('#customSwitch2').click(function(){
-                if($(this).prop('checked')){
-                  $('#scheduledate').val(moment().format('YYYY-MM-DD'));
-                  $('#sms-tab').prop('hidden',true);
-                }else{
-                  $('#scheduledate').val("");
-                  $('#sms-tab').prop('hidden',false);
-                }
-              });
+   readyTestFields()
+   readyStatusFields()
+   $('#scheduledate').change(function(){
+    $('#daysnotif').val($('#scheduledate').val());
+  });
+   $('#customSwitch2').click(function(){
+    if($(this).prop('checked')){
+      $('#scheduledate').val(moment().format('YYYY-MM-DD'));
+      $('#sms-tab').prop('hidden',true);
+    }else{
+      $('#scheduledate').val("");
+      $('#sms-tab').prop('hidden',false);
+    }
+  });
 
-              $('#waiver').DataTable();
-              $('#quickmed').DataTable();
+   $('#waiver').DataTable();
+   $('#quickmed').DataTable();
 
-              $('#transaction_table').DataTable({
-                ajax:{
-                  type: 'POST',
-                  url : url+"transactions",
-                  data: {
-                   appointment_id: <?php echo $ID;?>
+   let transaction_table = $('#transaction_table').DataTable({
+    ajax:{
+      type: 'POST',
+      url : url+"transactions",
+      data: {
+       appointment_id: <?php echo $ID;?>
                    // etc..
                  }
-               } 
+               },
+               "order": [[ 0, "desc" ]],
+               "columns": [
+               { "data": "payment_date" },
+               { "data": "total" },
+               { "data": "balance" },
+               { "data": "status" },
+               { "data": "action" }
+               ]
              });
+   $('#transaction_table tbody').on('click', 'tr', function () {
+    var data = transaction_table.row( this ).data();
+    let ls = '';
 
-              let filelisttable= $('#files_list').DataTable( {
-                ajax: url+'filelists/<?php echo $ID;?>',
-                "order": [[ 2, "desc" ]]
-              });
+    data.products.forEach(x=>{
+      ls += `
+      <center><h4>Balance : &#8369; ${formatMoney(data.balance)}</h4></center>
+      <form action="" method="POST" class="needs-validation" id="up_paymentform" novalidate>
+      <div class="form-row">
 
-              $('#next_time').timepicker();
-              $('#quick_view_med').on('click',function(){
-                $('#past_med').modal("show");
+      <div class="col-md-12 mb-2">
+      <div class="input-group mb-2">
+      <div class="input-group-prepend">
+      <div class="input-group-text">&#8369;</div>
+      </div>
+      <input type="number" class="form-control" id="up_paymentvalue">
+      </div>
+      <div class="valid-feedback">
+      Looks good!
+      </div>
+      </div>
 
-                $('#past_med').resizable({
+      <div class="col-md-12 mb-2">
+
+      <select class="custom-select my-1 mr-sm-2" id="up_status">
+      <option selected>Choose Status</option>
+      <option value="paid">Paid</option>
+      <option value="partial">Partial</option>
+      </select>
+      <div class="valid-feedback">
+      Looks good!
+      </div>
+      </div>
+
+      </div>
+      </form>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-primary float-right" onclick="savenewpayment()">Submit</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>`;
+      selectedtransaction = data;
+    });
+    $('#paymentContent').html(ls);
+    $('#paymentform').modal('show');
+
+  });
+   let filelisttable= $('#files_list').DataTable( {
+    ajax: url+'filelists/<?php echo $ID;?>',
+    "order": [[ 2, "desc" ]]
+  });
+
+   $('#next_time').timepicker();
+   $('#quick_view_med').on('click',function(){
+    $('#past_med').modal("show");
+
+    $('#past_med').resizable({
         //alsoResize: ".modal-dialog",
         minHeight: 300,
         minWidth: 300
       });
-                $('.modal-dialog').draggable();
+    $('.modal-dialog').draggable();
 
-                $('#past_med').on('show.bs.modal', function() {
-                  $(this).find('.modal-body').css({
-                    'max-height': '100%'
-                  });
-                });
-              });
+    $('#past_med').on('show.bs.modal', function() {
+      $(this).find('.modal-body').css({
+        'max-height': '100%'
+      });
+    });
+  });
     // $('#takesnapshot').tooltip('toggle');
     // $('#addfile').tooltip('toggle');
     // $('#uploadAll').tooltip('toggle');
@@ -1325,7 +1296,6 @@ if($remarks == 'Upcoming'){
         data[x.name] = x.value;
       });
       // console.log(data);
-      data['clinic_id'] = <?php echo $myclinic_id;?>;
       $.ajax({
         url: url+"appointment/",
         data:data,
@@ -1677,7 +1647,7 @@ if($remarks == 'Upcoming'){
         total += x.price;
       });
       let totaltax = 0;
-       <?php foreach($taxes as $tax){?>
+      <?php foreach($taxes as $tax){?>
         let tax<?php echo $tax->tax_id;?> = 0;
         if(<?php echo $tax->is_percent;?> == 1){
 
@@ -1781,56 +1751,62 @@ if($remarks == 'Upcoming'){
       });
 
     });
-    function addProduct(name,price,stocks){
+    function printData(){
+     var divToPrint=document.getElementById("past-medical-services");
+     newWin= window.open("");
+     newWin.document.write(divToPrint.outerHTML);
+     newWin.print();
+     newWin.close();
+   }
+   function addProduct(name,price,stocks){
 
-      let content = document.querySelector('#productcontent');
-      let id = count;
+    let content = document.querySelector('#productcontent');
+    let id = count;
 
-      let ls='';
-      let total = 0;
-      let tax = 0;
-      let grosstotal = 0;
-      let producttotal = 0;
-      let quantity = 1;
-      //let quantity = prompt("How many Items you want to add?", "#");
-      //console.log(stocks);
-      //if(stocks > 0){
-        //let limit =0;
-        //limit = stocks - quantity;
-        //if(limit <= 0){
-          //alert('Quantity exceed the stock limit');
-         // return;
-        //}
-     // }
-      //if(price === 0 || price === ''){
-       // alert('Please input valid amount');
-      //  return;
-      //}
-     // if(name == ''){
-       // alert('Please input product name');
-      //  return; 
-     // }
-      //if(quantity == ''){
-       // alert('Please input valid quantity');
-       // return; 
-      //}
-     // if(quantity <= 0){
-        //alert('Please input valid quantity');
-        //return; 
-      //}
-      price = parseFloat(price).toFixed(2)    
-      producttotal = price * parseInt(quantity);
-      producttotal = parseFloat(producttotal).toFixed(2) 
-      let newelement = document.createElement('tr');
-      newelement.setAttribute('id',"invoice"+id);
-      content.appendChild(newelement);
-      ls += `<td class="col-md-9"><em>${name}</em></h4></td>
-      <td class="col-md-2" style="text-align: center"> ${quantity}</td>
-      <td class="col-md-2 text-center">${formatMoney(price)}</td>
-      <td class="col-md-2 text-center">${formatMoney(producttotal)}</td>
-      <td class="col-md-2 text-center"><button  type="button" class="btn btn-danger" onclick="delInvoice(${count},'${name}')"><i class="fa fa-trash"></i></button></td>
-      </tr>`;
-      newelement.innerHTML = ls;
+    let ls='';
+    let total = 0;
+    let tax = 0;
+    let grosstotal = 0;
+    let producttotal = 0;
+    let quantity = prompt("How many Items you want to add?", "#");
+    console.log(stocks);
+    if(stocks > 0){
+      let limit =0;
+      limit = stocks - quantity;
+      if(limit <= 0){
+        alert('Quantity exceed the stock limit');
+        return;
+      }
+    }
+    if(price === 0 || price === ''){
+      alert('Please input valid amount');
+      return;
+    }
+    if(name == ''){
+      alert('Please input product name');
+      return; 
+    }
+    if(quantity == ''){
+      alert('Please input valid quantity');
+      return; 
+    }
+    if(quantity <= 0){
+      alert('Please input valid quantity');
+      return; 
+    }
+    price = parseFloat(price).toFixed(2)    
+    producttotal = price * parseInt(quantity);
+    producttotal = parseFloat(producttotal).toFixed(2) 
+    let newelement = document.createElement('tr');
+    newelement.setAttribute('id',"invoice"+id);
+    content.appendChild(newelement);
+    ls += `<td class="col-md-9"><em>${name}</em></h4></td>
+    <td class="col-md-2" style="text-align: center"> ${quantity}</td>
+    <td class="col-md-2 text-center">${formatMoney(price)}</td>
+    <td class="col-md-2 text-center">${formatMoney(producttotal)}</td>
+    <td class="col-md-2 text-center"><button  type="button" class="btn btn-danger" onclick="delInvoice(${count},'${name}')"><i class="fa fa-trash"></i></button></td>
+    </tr>`;
+    newelement.innerHTML = ls;
     // ls=`
     // <div class="form-row align-items-center" id="invoice${count}">
     // <div class="col-md-6" >
@@ -1931,8 +1907,11 @@ if($remarks == 'Upcoming'){
             }
           }
         },
-        templateValue: "{{product_title}}",
-        display: ["product_title"],
+        template: '<span>' +
+        '<span class="name">{{product_title}} </span>' +
+        '<span class="division"><small>Stock: {{product_quantity}}</small></span>' +
+        '</span>',
+        display: ["product_title" ,"product_quantity"],
         emptyTemplate: 'no result for {{query}}',
         source: {
           teams: {
@@ -2506,11 +2485,66 @@ function update_data(endpoint,datas){
   }
 
   function savetransaction(){
-    let data = {
-      order : allprice,
-      appointment_id : ''
+    let transaction_table= $('#transaction_table').DataTable();
+    let total = 0;
+    let tax = 0;
+    let grosstotal = 0;
+    let producttotal = 0;
+    let totaldeductions = 0;
+    let balance = 0;
+    let invoice_list = {
+      deductions : alldeductions,
+      orders:allprice,
+      'appointment_id': $('#appointment_id').val(),
+      'pet_id' : $('#pet_id').val(),
+      'owner_id': $('#owner_id').val(),
+      'clinic_id': <?php echo $myclinic_id;?>,
+      'status' : 'unpaid'
     }
-    console.log(data);
+    allprice.forEach(x=>{
+      total += x.price;
+    });
+
+    let totaltax = 0;
+    <?php foreach($taxes as $tax){?>
+      let tax<?php echo $tax->tax_id;?> = 0;
+      if(<?php echo $tax->is_percent;?> == 1){
+
+        tax<?php echo $tax->tax_id;?> = total * <?php echo ($tax->tax_value / 100);?>;
+      }else{
+        tax<?php echo $tax->tax_id;?> = <?php echo $tax->tax_value;?>;
+      }
+      // console.log(<?php echo $tax->tax_value;?>);
+      totaltax += tax<?php echo $tax->tax_id;?>;
+    <?php } ?>
+    grosstotal = total + totaltax;
+
+    invoice_list['subtotal'] = total;
+    invoice_list['gross_total'] = grosstotal;
+    invoice_list['owner_id'] = <?php echo $owner_id;?>;
+    alldeductions.forEach(x=>{
+      totaldeductions += parseInt(x.amount);
+    });
+
+    balance = grosstotal - totaldeductions;
+    invoice_list['balance'] = balance;
+
+
+    // console.log(invoice_list);
+
+    $.ajax({
+      url: url+"new/transaction",
+      data:JSON.stringify(invoice_list),
+      type: 'post',
+      dataType: 'json',
+      success: function(response) {
+        if(response.status == 200){
+          transaction_table.ajax.reload();           
+        }
+      }
+    });
+    // console.log(invoice_list);
+    // return invoice_list;
   }
   $('#payment').click(function(){
     // console.log(this.value);
@@ -2534,7 +2568,7 @@ function update_data(endpoint,datas){
       }else{
         tax<?php echo $tax->tax_id;?> = <?php echo $tax->tax_value;?>;
       }
-      console.log(<?php echo $tax->tax_value;?>);
+      // console.log(<?php echo $tax->tax_value;?>);
       totaltax += tax<?php echo $tax->tax_id;?>;
     <?php } ?>
     grosstotal = total + totaltax;
@@ -2545,8 +2579,9 @@ function update_data(endpoint,datas){
     alldeductions.push(data);
 
     alldeductions.forEach(x=>{
-      totaldeductions += x.amount;
+      totaldeductions += parseFloat(x.amount);
     });
+    // console.log(totaldeductions);
     grosstotal = grosstotal - totaldeductions;
 
     let newelement = document.createElement('tr');
@@ -2555,12 +2590,13 @@ function update_data(endpoint,datas){
     <td></td>
     <td></td>
     <td class="text-right"><h4><strong>Payment:</strong></h4></td>
-    <td class="text-center text-danger"><h1><strong>&#8369; ${payment}</strong></h1></td>
+    <td class="text-center text-danger"><h1><strong>&#8369; ${formatMoney(payment)}</strong></h1></td>
     </tr>`;
     newelement.innerHTML = ls;
 
 
-    $('#balancehtml').html('<h1> &#8369; '+parseFloat(grosstotal).toFixed(2)+'</h1>')
+    $('#balancehtml').html('<h1> &#8369; '+formatMoney(grosstotal)+'</h1>');
+    $('#paymentvalue').val('');
   });
 
   $('#couponsubmit').click(function(){
@@ -2576,9 +2612,6 @@ function update_data(endpoint,datas){
     allprice.forEach(x=>{
       total += x.price;
     });
-
-
-
     let totaltax = 0;
 
 
@@ -2590,7 +2623,7 @@ function update_data(endpoint,datas){
       }else{
         tax<?php echo $tax->tax_id;?> = <?php echo $tax->tax_value;?>;
       }
-      console.log(<?php echo $tax->tax_value;?>);
+      // console.log(<?php echo $tax->tax_value;?>);
       totaltax += tax<?php echo $tax->tax_id;?>;
       $('#tax<?php echo $tax->tax_id;?>').html('&#8369; '+parseFloat(tax<?php echo $tax->tax_id;?>).toFixed(2));
     <?php } ?>
@@ -2613,7 +2646,7 @@ function update_data(endpoint,datas){
       alldeductions.push(data);
 
       alldeductions.forEach(x=>{
-        totaldeductions += x.amount;
+        totaldeductions += parseFloat(x.amount);
       });
 
       grosstotal = grosstotal - totaldeductions;
@@ -2625,19 +2658,56 @@ function update_data(endpoint,datas){
       ls +=`<tr>
       <td></td>
       <td></td>
-      <td class="text-right"><h4><strong>Code: ${code} </strong></h4></td>
-      <td class="text-center text-danger"><h1><strong>&#8369; ${coup}</strong></h1></td>
+      <td class="text-right"><h4><strong>Discount: ${code} </strong></h4></td>
+      <td class="text-center text-danger"><h1><strong>&#8369; ${formatMoney(coup)}</strong></h1></td>
       </tr>`;
       newelement.innerHTML = ls;
       // $('#deductions').html(ls);
-      $('#balancehtml').html('<h1> &#8369; '+parseFloat(grosstotal).toFixed(2)+'</h1>')
+      $('#balancehtml').html('<h1> &#8369; '+formatMoney(grosstotal)+'</h1>');
     }else{
       // alert('Coupon not found');
     }
   <?php endforeach;?>
-
+  $('#couponcode').val('');
 });
 
+  function deletetransaction(id){
+    let transaction_table= $('#transaction_table').DataTable();
+    let datas = {
+      'action': 'delete',
+      'transaction_id' : id
+    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to recover this file!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.value) {
+        $.ajax({
+          url: url+"transaction/removeeach",
+          data:JSON.stringify(datas),
+          type: 'post',
+          dataType: 'json',
+          success: function(response) {
+            if(response.status == 200){
+              Swal.fire(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+                )
+              transaction_table.ajax.reload();
+            }
+
+          }
+        });
+        return false;
+      }
+    });
+  }
   function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     try {
       decimalCount = Math.abs(decimalCount);
@@ -2653,6 +2723,33 @@ function update_data(endpoint,datas){
       console.log(e)
     }
   }
-
+  function savenewpayment(){
+   let transaction_table= $('#transaction_table').DataTable();
+   let newbalance = 0;
+   newbalance = parseFloat(selectedtransaction.balance) - parseFloat($('#up_paymentvalue').val());
+   let invoice_list = {
+    deductions : selectedtransaction.deductions,
+    orders:selectedtransaction.products,
+    'appointment_id': selectedtransaction.appointment_id,
+    'owner_id': selectedtransaction.owner_id,
+    'status' : $('#up_status').val(),
+    'subtotal' : selectedtransaction.total,
+    'gross_total' : selectedtransaction.balance,
+    'balance' : parseFloat(newbalance)
+  }
+    // console.log(invoice_list);
+    $.ajax({
+      url: url+"new/transaction",
+      data:JSON.stringify(invoice_list),
+      type: 'post',
+      dataType: 'json',
+      success: function(response) {
+        if(response.status == 200){
+          transaction_table.ajax.reload();   
+          $('#up_paymentform').modal('hide');        
+        }
+      }
+    });
+  }
 </script>
 

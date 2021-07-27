@@ -1,5 +1,20 @@
 <?php include "page-header.php"; ?>
-<?php include "page-sidebar.php"; ?>
+<?php include "page-sidebar.php"; 
+
+global $wpdb;$current_user; wp_get_current_user();
+$user = get_userdata( get_current_user_id());
+$ID = get_current_user_id();
+$user_roles = $user->roles;
+if(!empty($user_roles)){
+    if (in_array( 'um_doctors', $user_roles, true ) || in_array( 'um_groomers', $user_roles, true ) ) {
+        $myclinic_id =  get_user_meta(get_current_user_id(),'clinic_id',true);
+    }else if(in_array( 'um_clinic', $user_roles, true )){
+        $myclinic_id = get_current_user_id();
+    }else{
+        $myclinic_id = get_current_user_id();
+    }
+}
+?>
 
 <div id="layoutSidenav_content">
 	<main>
@@ -36,7 +51,7 @@
 												<?php
 												global $wpdb;
 												$table=$wpdb->prefix.'vet_pets';
-												$results = $wpdb->get_results("SELECT * FROM {$table}");
+												$results = $wpdb->get_results("SELECT * FROM {$table} where clinic_id = {$myclinic_id}");
 												$arrayData = array();
 												foreach ($results as $key ) {
 													$age = date_diff(date_create(), date_create($key->pet_birthdate));
